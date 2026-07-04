@@ -1,0 +1,656 @@
+<section class="categories-page">
+
+  <!-- ── Page header ────────────────────────────────────────────── -->
+  <header class="fav-page-header categories-page__header">
+    <div class="fav-page-header__text">
+      <h1 class="fav-page-header__title">Categories</h1>
+      <p class="fav-page-header__subtitle">
+        Group your saved links into clear collections.
+      </p>
+    </div>
+    <div class="fav-page-header__actions">
+      <button
+        type="button"
+        class="fav-btn fav-btn--outline"
+        (click)="openOrganizeCategories()"
+        aria-label="Organize categories"
+      >
+        <i class="fa-solid fa-layer-group fav-icon" aria-hidden="true"></i>
+        <span>Organize categories</span>
+      </button>
+      <button type="button" class="fav-btn fav-btn--primary" (click)="openNewCategoryModal()">
+        <i [class]="icons.AddLink" class="fav-icon" aria-hidden="true"></i>
+        <span>+ New category</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main + right-rail layout ──────────────────────────────── -->
+  <div class="categories-page__layout">
+
+    <!-- ── Main column ───────────────────────────────────────────────── -->
+    <div class="categories-page__main">
+
+      <!-- ── Stat cards row ──────────────────────────────────── -->
+      <div class="categories-page__stat-cards">
+        <fav-stat-card
+          label="Total categories"
+          [value]="summaryLoading() ? '…' : (summary()?.totalCategories ?? 0)"
+          icon="fa-folder"
+          tone="teal"
+        />
+        <fav-stat-card
+          label="Largest category"
+          [value]="summaryLoading() ? '…' : (summary()?.largestCategory?.name ?? '—')"
+          icon="fa-folder-open"
+          tone="indigo"
+        />
+        <fav-stat-card
+          label="Empty categories"
+          [value]="summaryLoading() ? '…' : (summary()?.emptyCategories ?? 0)"
+          icon="fa-folder"
+          tone="amber"
+        />
+        <fav-stat-card
+          label="Recently added"
+          [value]="summaryLoading() ? '…' : (summary()?.recentlyAdded?.name ?? '—')"
+          icon="fa-clock-rotate-left"
+          tone="rose"
+        />
+      </div>
+
+      <!-- ── Filter toolbar — desktop ───────────────────────── -->
+      <div class="categories-page__toolbar categories-page__toolbar--desktop"
+           role="region" aria-label="Search, filter, and sort categories">
+
+        <!-- Search -->
+        <div class="categories-page__search">
+          <label for="categories-search" class="fav-sr-only">Search categories</label>
+          <div class="categories-page__search-field">
+            <i [class]="icons.Search" class="categories-page__search-icon" aria-hidden="true"></i>
+            <input
+              id="categories-search"
+              type="search"
+              class="fav-input categories-page__search-input"
+              placeholder="Search categories…"
+              autocomplete="off"
+              [formControl]="searchControl"
+            />
+            @if (searchControl.value) {
+              <button
+                type="button"
+                class="categories-page__search-clear"
+                aria-label="Clear search"
+                (click)="clearSearch()"
+              >
+                <i [class]="icons.Close" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="categories-page__filters">
+          <div class="fav-field categories-page__filter">
+            <label class="fav-label" for="categories-sort">Sort by</label>
+            <select
+              id="categories-sort"
+              class="fav-input"
+              [value]="activeSort()"
+              (change)="onSortChange($event)"
+            >
+              @for (opt of sortOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field categories-page__filter">
+            <label class="fav-label" for="categories-status-filter">Status</label>
+            <select
+              id="categories-status-filter"
+              class="fav-input"
+              [value]="activeStatus()"
+              (change)="onStatusChange($event)"
+            >
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Clear filters + view toggle -->
+        <div class="categories-page__toolbar-end">
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              class="categories-page__clear-filters"
+              (click)="clearAllFilters()"
+            >
+              Clear filters
+            </button>
+          }
+          <fav-view-toggle
+            pageId="categories"
+            (modeChange)="onViewModeChange($event)"
+          />
+        </div>
+      </div>
+
+      <!-- ── Filter button — mobile ────────────────────────── -->
+      <div class="categories-page__toolbar categories-page__toolbar--mobile">
+        <button type="button" class="fav-btn fav-btn--outline categories-page__filter-btn"
+                (click)="openFilterSheet()">
+          <i class="fa-solid fa-sliders fav-icon" aria-hidden="true"></i>
+          <span>Filters</span>
+          @if (hasActiveFilters()) {
+            <span class="categories-page__filter-badge" aria-label="Active filters"></span>
+          }
+        </button>
+        <fav-view-toggle
+          pageId="categories"
+          (modeChange)="onViewModeChange($event)"
+        />
+      </div>
+
+      <!-- ── Showing count ──────────────────────────────────────────── -->
+      @if (!loading() && !loadError() && total() > 0) {
+        <p class="categories-page__count">Showing {{ categories().length }} of {{ total() }} categories</p>
+      }
+
+      <!-- ── Loading state ──────────────────────────────────────────── -->
+      @if (loading()) {
+        <div class="fav-loading categories-page__loading" role="status" aria-live="polite">
+          <span class="fav-spinner" aria-hidden="true"></span>
+          <span>Loading categories...</span>
+        </div>
+
+      <!-- ── Error state ────────────────────────────────────────────── -->
+      } @else if (loadError(); as message) {
+        <div class="fav-alert fav-alert--danger categories-page__alert" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">
+            <p class="categories-page__alert-message">{{ message }}</p>
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reload()">
+              Try again
+            </button>
+          </div>
+        </div>
+
+      <!-- ── Empty state ────────────────────────────────────────────── -->
+      } @else if (categories().length === 0) {
+        <div class="fav-empty-state fav-empty-state--subtle categories-page__empty">
+          <div class="fav-empty-state__icon" aria-hidden="true">
+            <i [class]="icons.Categories"></i>
+          </div>
+          <h2 class="fav-empty-state__title">No categories yet</h2>
+          <p class="fav-empty-state__message">
+            Create categories here, or create them while saving a link.
+          </p>
+          <button type="button" class="fav-btn fav-btn--primary" (click)="openNewCategoryModal()">
+            <i [class]="icons.AddLink" aria-hidden="true"></i>
+            <span>+ New category</span>
+          </button>
+        </div>
+
+      <!-- ── Grid view ───────────────────────────────────────── -->
+      } @else if (viewMode() === 'cards') {
+        <div class="categories-page__grid" role="list" aria-label="Categories">
+          @for (category of categories(); track trackById($index, category)) {
+            <div role="listitem">
+              <fav-tile-card
+                icon="fa-folder"
+                [name]="category.name"
+                [subtitle]="linkCountLabel(category.linkCount)"
+                [meta]="activityLabel(category)"
+                [tone]="toneForIndex($index)"
+                actionLabel="Open category"
+                [menuItems]="getCategoryMenuItems()"
+                (action)="openCategoryLinks(category)"
+                (menuAction)="onTileMenuAction(category, $event)"
+              />
+            </div>
+          }
+        </div>
+
+      <!-- ── List view ───────────────────────────────────────── -->
+      } @else {
+        <div class="categories-page__list-wrap">
+          <table class="categories-page__table" aria-label="Categories">
+            <thead>
+              <tr>
+                <th class="categories-page__col-name" scope="col">Name</th>
+                <th class="categories-page__col-links" scope="col">Links</th>
+                <th class="categories-page__col-created" scope="col">Created</th>
+                <th class="categories-page__col-activity" scope="col">Last activity</th>
+                <th class="categories-page__col-actions" scope="col">
+                  <span class="fav-sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (category of categories(); track trackById($index, category)) {
+                <tr>
+                  <td class="categories-page__cell-name">
+                    @if (editingCategory()?.id === category.id) {
+                      <div class="categories-page__edit-field">
+                        <label class="fav-sr-only" [for]="'category-edit-' + category.id">Category name</label>
+                        <input
+                          class="fav-input fav-input--sm"
+                          type="text"
+                          maxlength="50"
+                          [id]="'category-edit-' + category.id"
+                          [formControl]="editControl"
+                          [class.is-invalid]="editControl.invalid && editControl.touched"
+                          [attr.aria-invalid]="editControl.invalid && editControl.touched ? 'true' : null"
+                          [attr.aria-describedby]="'category-edit-error-' + category.id"
+                          (keydown.enter)="saveEdit()"
+                          (keydown.escape)="cancelEditing()"
+                        />
+                        <div class="categories-page__color-swatches" role="radiogroup" aria-label="Category color">
+                          @for (swatch of colorPalette; track swatch) {
+                            <button
+                              type="button"
+                              class="categories-page__color-swatch"
+                              [class.categories-page__color-swatch--selected]="editColor() === swatch"
+                              [style.background-color]="swatch"
+                              [attr.aria-label]="'Color ' + swatch"
+                              [attr.aria-pressed]="editColor() === swatch"
+                              (click)="editColor.set(swatch)"
+                            ></button>
+                          }
+                          <label
+                            class="categories-page__color-custom"
+                            [class.categories-page__color-custom--selected]="!colorPalette.includes(editColor())"
+                            [style.--cat-color]="editColor()"
+                            title="Custom color"
+                          >
+                            <span class="fav-sr-only">Custom color</span>
+                            <i class="fa-solid fa-eye-dropper" aria-hidden="true"></i>
+                            <input
+                              type="color"
+                              class="categories-page__color-custom-input"
+                              [value]="editColor()"
+                              (input)="onCustomColorInput($event)"
+                              aria-label="Pick a custom color"
+                            />
+                          </label>
+                        </div>
+                        @if (editControl.touched &&
+                             (editControl.hasError('required') || editControl.hasError('blank'))) {
+                          <span class="fav-field-error" [id]="'category-edit-error-' + category.id">
+                            Enter a category name.
+                          </span>
+                        } @else if (editControl.touched && editControl.hasError('maxlength')) {
+                          <span class="fav-field-error" [id]="'category-edit-error-' + category.id">
+                            50 characters max.
+                          </span>
+                        } @else if (updateError(); as msg) {
+                          <span class="fav-field-error" [id]="'category-edit-error-' + category.id">{{ msg }}</span>
+                        }
+                      </div>
+                    } @else {
+                      <span class="categories-page__category-name">
+                        <span class="categories-page__category-icon" aria-hidden="true"
+                              [style.--cat-color]="category.color">
+                          <i [class]="icons.Category"></i>
+                        </span>
+                        {{ category.name }}
+                      </span>
+                    }
+                  </td>
+                  <td class="categories-page__cell-links">
+                    <span class="categories-page__meta">{{ category.linkCount }}</span>
+                  </td>
+                  <td class="categories-page__cell-created">
+                    <span class="categories-page__meta">
+                      {{ category.createdAtUtc | date: 'mediumDate' }}
+                    </span>
+                  </td>
+                  <td class="categories-page__cell-activity">
+                    <span class="categories-page__meta">
+                      {{ category.lastActivityAtUtc ? (category.lastActivityAtUtc | date: 'mediumDate') : 'Never' }}
+                    </span>
+                  </td>
+                  <td class="categories-page__cell-actions">
+                    <div class="categories-page__row-actions">
+                      @if (editingCategory()?.id === category.id) {
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--outline fav-btn--sm"
+                          [disabled]="updating()"
+                          (click)="cancelEditing()"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--primary fav-btn--sm"
+                          [class.is-loading]="updating()"
+                          [disabled]="updating()"
+                          (click)="saveEdit()"
+                        >
+                          @if (updating()) {
+                            <span class="fav-spinner" aria-hidden="true"></span>
+                            <span class="fav-sr-only">Saving…</span>
+                          }
+                          Save
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--ghost fav-btn--icon"
+                          [attr.aria-label]="'Rename ' + category.name"
+                          (click)="startEditing(category)"
+                        >
+                          <i [class]="icons.Edit" aria-hidden="true"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--ghost fav-btn--icon categories-page__delete-btn"
+                          [attr.aria-label]="'Delete ' + category.name"
+                          (click)="openDeleteConfirm(category)"
+                        >
+                          <i [class]="icons.Delete" aria-hidden="true"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- ── Pagination ──────────────────────────────────────── -->
+      @if (!loading() && !loadError() && total() > pageSize()) {
+        <fav-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [total]="total()"
+          (pageChange)="onPageChange($event)"
+        />
+      }
+
+    </div><!-- /categories-page__main -->
+
+    <!-- ── Right rail ─────────────────────────────────────────── -->
+    <fav-right-rail class="categories-page__rail">
+
+      <!-- Category health widget -->
+      <fav-rail-widget title="CATEGORY HEALTH">
+        <ul class="categories-page__health-list">
+          <li class="categories-page__health-item">
+            <span class="categories-page__health-label">Empty categories</span>
+            <span class="categories-page__health-value">
+              {{ summaryLoading() ? '…' : (summary()?.emptyCategories ?? 0) }}
+            </span>
+          </li>
+          <li class="categories-page__health-item">
+            <span class="categories-page__health-label">Uncategorized links</span>
+            <span class="categories-page__health-value">
+              {{ summaryLoading() ? '…' : uncategorizedLinks() }}
+            </span>
+          </li>
+          <li class="categories-page__health-item">
+            <span class="categories-page__health-label">Categories updated</span>
+            <span class="categories-page__health-value">
+              {{ loading() ? '…' : totalCategories() }}
+            </span>
+          </li>
+        </ul>
+      </fav-rail-widget>
+
+      <!-- Largest categories widget -->
+      <fav-rail-widget title="LARGEST CATEGORIES">
+        @if (categories().length === 0) {
+          <p class="categories-page__rail-empty">No categories yet.</p>
+        } @else {
+          <ul class="categories-page__largest-list">
+            @for (cat of topCategories(); track cat.id; let i = $index) {
+              <li class="categories-page__largest-item">
+                <span class="categories-page__largest-name">{{ cat.name }}</span>
+                <div class="categories-page__largest-bar-wrap">
+                  <div
+                    class="categories-page__largest-bar"
+                    [style.width.%]="largestBarWidth(i)"
+                    aria-hidden="true"
+                  ></div>
+                </div>
+                <span class="categories-page__largest-count">{{ cat.linkCount }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </fav-rail-widget>
+
+    </fav-right-rail>
+
+  </div><!-- /categories-page__layout -->
+
+  <!-- ── New category modal ──────────────────────────────────────────── -->
+  @if (newCategoryModalOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeNewCategoryModal()"></div>
+    <div
+      class="fav-modal fav-modal--sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="new-category-title"
+    >
+      <div class="fav-modal__dialog" favFocusTrap>
+        <div class="fav-modal__header">
+          <div>
+            <h2 class="fav-modal__title" id="new-category-title">New category</h2>
+            <p class="fav-modal__subtitle">Give your category a short, clear name.</p>
+          </div>
+          <button
+            type="button"
+            class="fav-modal__close"
+            aria-label="Close"
+            [disabled]="creating()"
+            (click)="closeNewCategoryModal()"
+          >
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <form (submit)="$event.preventDefault(); createCategory()" novalidate>
+          <div class="fav-modal__body">
+            <div class="fav-field">
+              <label class="fav-label" for="new-category-name">Name</label>
+              <input
+                id="new-category-name"
+                class="fav-input"
+                type="text"
+                maxlength="50"
+                autocomplete="off"
+                placeholder="e.g. Work"
+                [formControl]="createControl"
+                [class.is-invalid]="createControl.invalid && createControl.touched"
+                [attr.aria-invalid]="createControl.invalid && createControl.touched ? 'true' : null"
+                aria-describedby="new-category-name-error"
+              />
+              @if (createControl.touched &&
+                   (createControl.hasError('required') || createControl.hasError('blank'))) {
+                <span id="new-category-name-error" class="fav-field-error">Enter a category name.</span>
+              } @else if (createControl.touched && createControl.hasError('maxlength')) {
+                <span id="new-category-name-error" class="fav-field-error">
+                  Keep the category name to 50 characters or fewer.
+                </span>
+              } @else if (createError(); as message) {
+                <span id="new-category-name-error" class="fav-field-error">{{ message }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="fav-modal__footer">
+            <button
+              type="button"
+              class="fav-btn fav-btn--outline"
+              [disabled]="creating()"
+              (click)="closeNewCategoryModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="fav-btn fav-btn--primary"
+              [class.is-loading]="creating()"
+              [disabled]="creating()"
+            >
+              @if (creating()) {
+                <span class="fav-spinner" aria-hidden="true"></span>
+                <span class="fav-sr-only">Creating…</span>
+              }
+              Create category
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ── Delete confirm modal ──────────────────────────────────────────── -->
+  @if (deleteTarget(); as target) {
+    <div class="fav-modal-backdrop" (click)="closeDeleteConfirm()"></div>
+    <div
+      class="fav-modal fav-modal--sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="category-delete-title"
+      aria-describedby="category-delete-description"
+    >
+      <div class="fav-modal__dialog" favFocusTrap>
+        <div class="fav-modal__header">
+          <div>
+            <h2 class="fav-modal__title" id="category-delete-title">Delete this category?</h2>
+            <p class="fav-modal__subtitle">Links in this category will keep their tags but lose the category assignment.</p>
+          </div>
+          <button
+            type="button"
+            class="fav-modal__close"
+            aria-label="Close"
+            [disabled]="deleting()"
+            (click)="closeDeleteConfirm()"
+          >
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="fav-modal__body">
+          <p class="categories-page__delete-prompt" id="category-delete-description">
+            You are about to delete <strong>{{ target.name }}</strong>.
+          </p>
+          @if (deleteError(); as message) {
+            <div class="fav-alert fav-alert--danger" role="alert">
+              <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+              <div class="fav-alert__body">{{ message }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="fav-modal__footer">
+          <button
+            type="button"
+            class="fav-btn fav-btn--outline"
+            [disabled]="deleting()"
+            (click)="closeDeleteConfirm()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="fav-btn fav-btn--danger"
+            [class.is-loading]="deleting()"
+            [disabled]="deleting()"
+            (click)="confirmDelete()"
+          >
+            @if (deleting()) {
+              <span class="fav-spinner" aria-hidden="true"></span>
+              <span class="fav-sr-only">Deleting…</span>
+            }
+            <span class="fav-btn__label">Delete category</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Mobile filter sheet ─────────────────────────────────────────── -->
+  @if (filterSheetOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeFilterSheet()"></div>
+    <div class="categories-page__filter-sheet" role="dialog" aria-modal="true" aria-label="Filters" favFocusTrap>
+      <div class="categories-page__filter-sheet-header">
+        <h2 class="categories-page__filter-sheet-title">Filters</h2>
+        <button type="button" class="fav-modal__close" aria-label="Close filters"
+                (click)="closeFilterSheet()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="categories-page__filter-sheet-body">
+        <div class="fav-field">
+          <label class="fav-label" for="categories-search-sheet">Search</label>
+          <div class="categories-page__search-field">
+            <i [class]="icons.Search" class="categories-page__search-icon" aria-hidden="true"></i>
+            <input
+              id="categories-search-sheet"
+              type="search"
+              class="fav-input categories-page__search-input"
+              placeholder="Search categories…"
+              autocomplete="off"
+              [formControl]="searchControl"
+            />
+          </div>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="categories-sort-sheet">Sort by</label>
+          <select
+            id="categories-sort-sheet"
+            class="fav-input"
+            [value]="activeSort()"
+            (change)="onSortChange($event)"
+          >
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="categories-status-sheet">Status</label>
+          <select
+            id="categories-status-sheet"
+            class="fav-input"
+            [value]="activeStatus()"
+            (change)="onStatusChange($event)"
+          >
+            @for (opt of statusOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="categories-page__filter-sheet-footer">
+        @if (hasActiveFilters()) {
+          <button type="button" class="fav-btn fav-btn--outline" (click)="clearAllFilters()">
+            Clear all
+          </button>
+        }
+        <button type="button" class="fav-btn fav-btn--primary" (click)="closeFilterSheet()">
+          Apply
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Organize categories modal ─────────────────────────────── -->
+  @if (organizeCategoriesOpen()) {
+    <app-organize-categories-modal (closed)="onOrganizeCategoriesClosed($event)" />
+  }
+
+</section>

@@ -1,0 +1,615 @@
+<section class="tags-page">
+
+  <!-- ── Page header ────────────────────────────────────────────── -->
+  <header class="fav-page-header tags-page__header">
+    <div class="fav-page-header__text">
+      <h1 class="fav-page-header__title">Tags</h1>
+      <p class="fav-page-header__subtitle">
+        Organize your saved links with simple, reusable labels.
+      </p>
+    </div>
+    <div class="fav-page-header__actions">
+      <button
+        type="button"
+        class="fav-btn fav-btn--outline"
+        (click)="openManageDuplicates()"
+        aria-label="Manage duplicate tags"
+      >
+        <i class="fa-solid fa-code-merge fav-icon" aria-hidden="true"></i>
+        <span>Manage duplicates</span>
+      </button>
+      <button type="button" class="fav-btn fav-btn--primary" (click)="openNewTagModal()">
+        <i [class]="icons.AddLink" class="fav-icon" aria-hidden="true"></i>
+        <span>New tag</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main + right-rail layout ──────────────────────────────── -->
+  <div class="tags-page__layout">
+
+    <!-- ── Main column ───────────────────────────────────────────────── -->
+    <div class="tags-page__main">
+
+      <!-- ── Stat cards row ──────────────────────────────────── -->
+      <div class="tags-page__stat-cards">
+        <fav-stat-card
+          label="Total tags"
+          [value]="summaryLoading() ? '…' : (summary()?.totalTags ?? 0)"
+          icon="fa-tag"
+          tone="teal"
+        />
+        <fav-stat-card
+          label="Most used"
+          [value]="summaryLoading() ? '…' : (summary()?.mostUsed?.name ?? '—')"
+          icon="fa-fire"
+          tone="indigo"
+        />
+        <fav-stat-card
+          label="Unused tags"
+          [value]="summaryLoading() ? '…' : (summary()?.unusedTags ?? 0)"
+          icon="fa-tag"
+          tone="amber"
+        />
+        <fav-stat-card
+          label="Recently added"
+          [value]="summaryLoading() ? '…' : (summary()?.recentlyAdded?.name ?? '—')"
+          icon="fa-clock-rotate-left"
+          tone="rose"
+        />
+      </div>
+
+      <!-- ── Filter toolbar — desktop ───────────────────────── -->
+      <div class="tags-page__toolbar tags-page__toolbar--desktop"
+           role="region" aria-label="Search, filter, and sort tags">
+
+        <!-- Search -->
+        <div class="tags-page__search">
+          <label for="tags-search" class="fav-sr-only">Search tags</label>
+          <div class="tags-page__search-field">
+            <i [class]="icons.Search" class="tags-page__search-icon" aria-hidden="true"></i>
+            <input
+              id="tags-search"
+              type="search"
+              class="fav-input tags-page__search-input"
+              placeholder="Search tags…"
+              autocomplete="off"
+              [formControl]="searchControl"
+            />
+            @if (searchControl.value) {
+              <button
+                type="button"
+                class="tags-page__search-clear"
+                aria-label="Clear search"
+                (click)="clearSearch()"
+              >
+                <i [class]="icons.Close" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="tags-page__filters">
+          <div class="fav-field tags-page__filter">
+            <label class="fav-label" for="tags-status-filter">Status</label>
+            <select
+              id="tags-status-filter"
+              class="fav-input"
+              [value]="activeStatus()"
+              (change)="onStatusChange($event)"
+            >
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field tags-page__filter">
+            <label class="fav-label" for="tags-sort">Sort by</label>
+            <select
+              id="tags-sort"
+              class="fav-input"
+              [value]="activeSort()"
+              (change)="onSortChange($event)"
+            >
+              @for (opt of sortOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Clear filters + view toggle -->
+        <div class="tags-page__toolbar-end">
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              class="tags-page__clear-filters"
+              (click)="clearAllFilters()"
+            >
+              Clear filters
+            </button>
+          }
+          <fav-view-toggle
+            pageId="tags"
+            (modeChange)="onViewModeChange($event)"
+          />
+        </div>
+      </div>
+
+      <!-- ── Filter button — mobile ────────────────────────── -->
+      <div class="tags-page__toolbar tags-page__toolbar--mobile">
+        <button type="button" class="fav-btn fav-btn--outline tags-page__filter-btn"
+                (click)="openFilterSheet()">
+          <i class="fa-solid fa-sliders fav-icon" aria-hidden="true"></i>
+          <span>Filters</span>
+          @if (hasActiveFilters()) {
+            <span class="tags-page__filter-badge" aria-label="Active filters"></span>
+          }
+        </button>
+        <fav-view-toggle
+          pageId="tags"
+          (modeChange)="onViewModeChange($event)"
+        />
+      </div>
+
+      <!-- ── Showing count ──────────────────────────────────────────── -->
+      @if (!loading() && !loadError() && total() > 0) {
+        <p class="tags-page__count">Showing {{ tags().length }} of {{ total() }} tags</p>
+      }
+
+      <!-- ── Loading state ──────────────────────────────────────────── -->
+      @if (loading()) {
+        <div class="fav-loading tags-page__loading" role="status" aria-live="polite">
+          <span class="fav-spinner" aria-hidden="true"></span>
+          <span>Loading tags…</span>
+        </div>
+
+      <!-- ── Error state ────────────────────────────────────────────── -->
+      } @else if (loadError(); as message) {
+        <div class="fav-alert fav-alert--danger tags-page__alert" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">
+            <p class="tags-page__alert-message">{{ message }}</p>
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reload()">
+              Try again
+            </button>
+          </div>
+        </div>
+
+      <!-- ── Empty state ────────────────────────────────────────────── -->
+      } @else if (tags().length === 0) {
+        <div class="fav-empty-state fav-empty-state--subtle tags-page__empty">
+          <div class="fav-empty-state__icon" aria-hidden="true">
+            <i [class]="icons.Tags"></i>
+          </div>
+          <h2 class="fav-empty-state__title">No tags yet</h2>
+          <p class="fav-empty-state__message">
+            Create tags here, or add them while saving a link.
+          </p>
+          <button type="button" class="fav-btn fav-btn--primary" (click)="openNewTagModal()">
+            <i [class]="icons.AddLink" aria-hidden="true"></i>
+            <span>New tag</span>
+          </button>
+        </div>
+
+      <!-- ── Grid view ───────────────────────────────────────── -->
+      } @else if (viewMode() === 'cards') {
+        <div class="tags-page__grid" role="list" aria-label="Tags">
+          @for (tag of tags(); track trackById($index, tag)) {
+            <div role="listitem">
+              <fav-tile-card
+                icon="fa-tag"
+                [name]="tag.name"
+                [subtitle]="linkCountLabel(tag.linkCount)"
+                [meta]="lastUsedLabel(tag)"
+                [tone]="toneForIndex($index)"
+                actionLabel="Open links"
+                [menuItems]="getTileMenuItems()"
+                (action)="openTagLinks(tag)"
+                (menuAction)="onTileMenuAction(tag, $event)"
+              />
+            </div>
+          }
+        </div>
+
+      <!-- ── List view ───────────────────────────────────────── -->
+      } @else {
+        <div class="tags-page__list-wrap">
+          <table class="tags-page__table" aria-label="Tags">
+            <thead>
+              <tr>
+                <th class="tags-page__col-name" scope="col">Name</th>
+                <th class="tags-page__col-links" scope="col">Links</th>
+                <th class="tags-page__col-created" scope="col">Created</th>
+                <th class="tags-page__col-last-used" scope="col">Last used</th>
+                <th class="tags-page__col-actions" scope="col">
+                  <span class="fav-sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tag of tags(); track trackById($index, tag)) {
+                <tr>
+                  <td class="tags-page__cell-name">
+                    @if (editingTag()?.id === tag.id) {
+                      <div class="tags-page__edit-field">
+                        <label class="fav-sr-only" [for]="'tag-edit-' + tag.id">Tag name</label>
+                        <input
+                          class="fav-input fav-input--sm"
+                          type="text"
+                          maxlength="50"
+                          [id]="'tag-edit-' + tag.id"
+                          [formControl]="editControl"
+                          [class.is-invalid]="editControl.invalid && editControl.touched"
+                          [attr.aria-invalid]="editControl.invalid && editControl.touched ? 'true' : null"
+                          [attr.aria-describedby]="'tag-edit-error-' + tag.id"
+                          (keydown.enter)="saveEdit()"
+                          (keydown.escape)="cancelEditing()"
+                        />
+                        @if (editControl.touched &&
+                             (editControl.hasError('required') || editControl.hasError('blank'))) {
+                          <span class="fav-field-error" [id]="'tag-edit-error-' + tag.id">
+                            Enter a tag name.
+                          </span>
+                        } @else if (editControl.touched && editControl.hasError('maxlength')) {
+                          <span class="fav-field-error" [id]="'tag-edit-error-' + tag.id">
+                            50 characters max.
+                          </span>
+                        } @else if (updateError(); as msg) {
+                          <span class="fav-field-error" [id]="'tag-edit-error-' + tag.id">{{ msg }}</span>
+                        }
+                      </div>
+                    } @else {
+                      <span class="tags-page__tag-name">
+                        <span class="tags-page__tag-dot" aria-hidden="true"></span>
+                        {{ tag.name }}
+                      </span>
+                    }
+                  </td>
+                  <td class="tags-page__cell-links">
+                    <span class="tags-page__link-count">{{ tag.linkCount }}</span>
+                  </td>
+                  <td class="tags-page__cell-created">
+                    <span class="tags-page__meta">{{ tag.createdAtUtc | date: 'mediumDate' }}</span>
+                  </td>
+                  <td class="tags-page__cell-last-used">
+                    <span class="tags-page__meta">
+                      {{ tag.lastUsedAtUtc ? (tag.lastUsedAtUtc | date: 'mediumDate') : 'Never' }}
+                    </span>
+                  </td>
+                  <td class="tags-page__cell-actions">
+                    <div class="tags-page__row-actions">
+                      @if (editingTag()?.id === tag.id) {
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--outline fav-btn--sm"
+                          [disabled]="updating()"
+                          (click)="cancelEditing()"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--primary fav-btn--sm"
+                          [class.is-loading]="updating()"
+                          [disabled]="updating()"
+                          (click)="saveEdit()"
+                        >
+                          @if (updating()) {
+                            <span class="fav-spinner" aria-hidden="true"></span>
+                            <span class="fav-sr-only">Saving…</span>
+                          }
+                          Save
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--ghost fav-btn--icon"
+                          [attr.aria-label]="'Rename ' + tag.name"
+                          (click)="startEditing(tag)"
+                        >
+                          <i [class]="icons.Edit" aria-hidden="true"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="fav-btn fav-btn--ghost fav-btn--icon tags-page__delete-btn"
+                          [attr.aria-label]="'Delete ' + tag.name"
+                          (click)="openDeleteConfirm(tag)"
+                        >
+                          <i [class]="icons.Delete" aria-hidden="true"></i>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- ── Pagination ──────────────────────────────────────── -->
+      @if (!loading() && !loadError() && total() > pageSize()) {
+        <fav-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [total]="total()"
+          (pageChange)="onPageChange($event)"
+        />
+      }
+
+    </div><!-- /tags-page__main -->
+
+    <!-- ── Right rail ─────────────────────────────────────────── -->
+    <fav-right-rail class="tags-page__rail">
+
+      <!-- Tag health widget -->
+      <fav-rail-widget title="TAG HEALTH">
+        <ul class="tags-page__health-list">
+          <li class="tags-page__health-item">
+            <span class="tags-page__health-label">Unused tags</span>
+            <span class="tags-page__health-value">
+              {{ summaryLoading() ? '…' : (summary()?.unusedTags ?? 0) }}
+            </span>
+          </li>
+          <li class="tags-page__health-item">
+            <span class="tags-page__health-label">Possible duplicates</span>
+            <span class="tags-page__health-value">
+              {{ summaryLoading() ? '…' : (summary()?.possibleDuplicates ?? 0) }}
+            </span>
+          </li>
+          <li class="tags-page__health-item">
+            <span class="tags-page__health-label">Tags with 20+ links</span>
+            <span class="tags-page__health-value">
+              {{ loading() ? '…' : overloadedTags() }}
+            </span>
+          </li>
+        </ul>
+      </fav-rail-widget>
+
+      <!-- Popular tags widget -->
+      <fav-rail-widget title="POPULAR TAGS">
+        @if (tags().length === 0) {
+          <p class="tags-page__rail-empty">No tags yet.</p>
+        } @else {
+          <div class="tags-page__popular-chips">
+            @for (tag of popularTags(); track tag.id) {
+              <span class="tags-page__chip">{{ tag.name }} - {{ tag.linkCount }}</span>
+            }
+          </div>
+        }
+      </fav-rail-widget>
+
+    </fav-right-rail>
+
+  </div><!-- /tags-page__layout -->
+
+  <!-- ── New tag modal ────────────────────────────────────────────────── -->
+  @if (newTagModalOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeNewTagModal()"></div>
+    <div
+      class="fav-modal fav-modal--sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="new-tag-title"
+    >
+      <div class="fav-modal__dialog" favFocusTrap>
+        <div class="fav-modal__header">
+          <div>
+            <h2 class="fav-modal__title" id="new-tag-title">New tag</h2>
+            <p class="fav-modal__subtitle">Give your tag a short, clear name.</p>
+          </div>
+          <button
+            type="button"
+            class="fav-modal__close"
+            aria-label="Close"
+            [disabled]="creating()"
+            (click)="closeNewTagModal()"
+          >
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <form (submit)="$event.preventDefault()" novalidate>
+          <div class="fav-modal__body">
+            <div class="fav-field">
+              <label class="fav-label" for="new-tag-name">Name</label>
+              <input
+                id="new-tag-name"
+                class="fav-input"
+                type="text"
+                maxlength="50"
+                autocomplete="off"
+                placeholder="e.g. Research"
+                [formControl]="createControl"
+                (keydown.enter)="createTag()"
+                [class.is-invalid]="createControl.invalid && createControl.touched"
+                [attr.aria-invalid]="createControl.invalid && createControl.touched ? 'true' : null"
+                aria-describedby="new-tag-name-error"
+              />
+              @if (createControl.touched &&
+                   (createControl.hasError('required') || createControl.hasError('blank'))) {
+                <span id="new-tag-name-error" class="fav-field-error">Enter a tag name.</span>
+              } @else if (createControl.touched && createControl.hasError('maxlength')) {
+                <span id="new-tag-name-error" class="fav-field-error">
+                  Keep the tag name to 50 characters or fewer.
+                </span>
+              } @else if (createError(); as message) {
+                <span id="new-tag-name-error" class="fav-field-error">{{ message }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="fav-modal__footer">
+            <button
+              type="button"
+              class="fav-btn fav-btn--outline"
+              [disabled]="creating()"
+              (click)="closeNewTagModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="fav-btn fav-btn--primary"
+              [class.is-loading]="creating()"
+              [disabled]="creating()"
+              (click)="createTag()"
+            >
+              @if (creating()) {
+                <span class="fav-spinner" aria-hidden="true"></span>
+                <span class="fav-sr-only">Creating…</span>
+              }
+              Create tag
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ── Delete confirm modal ──────────────────────────────────────────── -->
+  @if (deleteTarget(); as target) {
+    <div class="fav-modal-backdrop" (click)="closeDeleteConfirm()"></div>
+    <div
+      class="fav-modal fav-modal--sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tag-delete-title"
+      aria-describedby="tag-delete-description"
+    >
+      <div class="fav-modal__dialog" favFocusTrap>
+        <div class="fav-modal__header">
+          <div>
+            <h2 class="fav-modal__title" id="tag-delete-title">Delete this tag?</h2>
+            <p class="fav-modal__subtitle">It will be removed from any links that use it.</p>
+          </div>
+          <button
+            type="button"
+            class="fav-modal__close"
+            aria-label="Close"
+            [disabled]="deleting()"
+            (click)="closeDeleteConfirm()"
+          >
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="fav-modal__body">
+          <p class="tags-page__delete-prompt" id="tag-delete-description">
+            You are about to delete <strong>{{ target.name }}</strong>.
+          </p>
+          @if (deleteError(); as message) {
+            <div class="fav-alert fav-alert--danger" role="alert">
+              <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+              <div class="fav-alert__body">{{ message }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="fav-modal__footer">
+          <button
+            type="button"
+            class="fav-btn fav-btn--outline"
+            [disabled]="deleting()"
+            (click)="closeDeleteConfirm()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="fav-btn fav-btn--danger"
+            [class.is-loading]="deleting()"
+            [disabled]="deleting()"
+            (click)="confirmDelete()"
+          >
+            @if (deleting()) {
+              <span class="fav-spinner" aria-hidden="true"></span>
+              <span class="fav-sr-only">Deleting…</span>
+            }
+            <span class="fav-btn__label">Delete tag</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Mobile filter sheet ─────────────────────────────────── -->
+  @if (filterSheetOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeFilterSheet()"></div>
+    <div class="tags-page__filter-sheet" role="dialog" aria-modal="true" aria-label="Filters" favFocusTrap>
+      <div class="tags-page__filter-sheet-header">
+        <h2 class="tags-page__filter-sheet-title">Filters</h2>
+        <button type="button" class="fav-modal__close" aria-label="Close filters"
+                (click)="closeFilterSheet()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="tags-page__filter-sheet-body">
+        <!-- Search -->
+        <div class="fav-field">
+          <label class="fav-label" for="tags-search-sheet">Search</label>
+          <div class="tags-page__search-field">
+            <i [class]="icons.Search" class="tags-page__search-icon" aria-hidden="true"></i>
+            <input
+              id="tags-search-sheet"
+              type="search"
+              class="fav-input tags-page__search-input"
+              placeholder="Search tags…"
+              autocomplete="off"
+              [formControl]="searchControl"
+            />
+          </div>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="tags-status-sheet">Status</label>
+          <select
+            id="tags-status-sheet"
+            class="fav-input"
+            [value]="activeStatus()"
+            (change)="onStatusChange($event)"
+          >
+            @for (opt of statusOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="tags-sort-sheet">Sort by</label>
+          <select
+            id="tags-sort-sheet"
+            class="fav-input"
+            [value]="activeSort()"
+            (change)="onSortChange($event)"
+          >
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="tags-page__filter-sheet-footer">
+        @if (hasActiveFilters()) {
+          <button type="button" class="fav-btn fav-btn--outline" (click)="clearAllFilters()">
+            Clear all
+          </button>
+        }
+        <button type="button" class="fav-btn fav-btn--primary" (click)="closeFilterSheet()">
+          Apply
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Manage duplicates modal ───────────────────────────────── -->
+  @if (manageDuplicatesOpen()) {
+    <app-manage-duplicates-modal (closed)="onManageDuplicatesClosed($event)" />
+  }
+
+</section>

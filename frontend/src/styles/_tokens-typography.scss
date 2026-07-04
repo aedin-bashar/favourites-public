@@ -1,0 +1,85 @@
+// Design tokens — typography
+// Source: docs/UI_DESIGN_GUIDE.md §5
+// Clean sans-serif system font stack. No viewport-based scaling.
+
+:root {
+  // Font families — system stack (Bootstrap's default is acceptable per the guide)
+  --fav-font-family-sans: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --fav-font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  // Base
+  --fav-font-size-base: 1rem;        // 16px
+  --fav-line-height-base: 1.5;
+  --fav-letter-spacing-base: 0;      // guide: keep letter spacing normal
+
+  // Weights
+  --fav-font-weight-regular: 400;
+  --fav-font-weight-medium:  500;
+  --fav-font-weight-semibold: 600;
+  --fav-font-weight-bold:    700;
+
+  // Size scale
+  --fav-font-size-xs:   0.75rem;     // 12px — meta, counts
+  --fav-font-size-sm:   0.875rem;    // 14px — muted helper text, dates
+  --fav-font-size-md:   1rem;        // 16px — body
+  --fav-font-size-lg:   1.125rem;    // 18px — emphasized body
+  --fav-font-size-xl:   1.25rem;     // 20px — card titles
+  --fav-font-size-2xl:  1.5rem;      // 24px — section headings
+  --fav-font-size-3xl:  1.875rem;    // 30px — app page H1
+  --fav-font-size-4xl:  2.25rem;     // 36px — landing section H2
+  --fav-font-size-5xl:  3rem;        // 48px — landing hero H1
+
+  // Line heights
+  --fav-line-height-tight:  1.2;     // headings
+  --fav-line-height-snug:   1.35;
+  --fav-line-height-normal: 1.5;     // body
+  --fav-line-height-loose:  1.7;
+
+  // Semantic role tokens — pair size + weight + color expectations per UI guide §5
+  --fav-text-landing-h1-size:   var(--fav-font-size-5xl);
+  --fav-text-landing-h1-weight: var(--fav-font-weight-bold);
+
+  --fav-text-app-h1-size:       var(--fav-font-size-3xl);
+  --fav-text-app-h1-weight:     var(--fav-font-weight-bold);
+
+  --fav-text-section-size:      var(--fav-font-size-2xl);
+  --fav-text-section-weight:    var(--fav-font-weight-semibold);
+
+  --fav-text-card-title-size:   var(--fav-font-size-xl);
+  --fav-text-card-title-weight: var(--fav-font-weight-semibold);
+
+  --fav-text-label-size:        var(--fav-font-size-sm);
+  --fav-text-label-weight:      var(--fav-font-weight-medium);
+
+  --fav-text-body-size:         var(--fav-font-size-md);
+  --fav-text-body-weight:       var(--fav-font-weight-regular);
+
+  --fav-text-muted-size:        var(--fav-font-size-sm);
+  --fav-text-muted-weight:      var(--fav-font-weight-regular);
+
+  // Redesign typography tokens — see UI guide §21.14
+  // Large page titles: "Dashboard", "All Links", "Tags", etc.
+  --fav-text-page-title-size:   var(--fav-font-size-3xl);   // 30px
+  --fav-text-page-title-weight: var(--fav-font-weight-bold);
+
+  // Page subtitle line below the title
+  --fav-text-page-subtitle-size:   var(--fav-font-size-sm);    // 14px
+  --fav-text-page-subtitle-weight: var(--fav-font-weight-regular);
+
+  // Stat card large value number
+  --fav-text-stat-value-size:   var(--fav-font-size-3xl);   // 30px — within 28-32px target
+  --fav-text-stat-value-weight: var(--fav-font-weight-bold);
+
+  // Stat card label below the value
+  --fav-text-stat-label-size:   var(--fav-font-size-xs);    // 12px
+  --fav-text-stat-label-weight: var(--fav-font-weight-regular);
+
+  // Right-rail widget headers: "COMMON TAGS", "QUICK ACCESS" etc. (uppercase, small)
+  --fav-text-rail-header-size:        0.6875rem;             // 11px
+  --fav-text-rail-header-weight:      var(--fav-font-weight-medium);
+  --fav-text-rail-header-transform:   uppercase;
+  --fav-text-rail-header-spacing:     0.06em;                // subtle letter-spacing for caps
+}

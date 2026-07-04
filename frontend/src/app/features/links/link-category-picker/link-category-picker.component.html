@@ -1,0 +1,109 @@
+<div class="link-category-picker">
+  <div class="link-category-picker__heading">
+    <label class="fav-label" [for]="inputId">Category</label>
+    <span class="fav-help">(optional)</span>
+  </div>
+
+  @if (loading()) {
+    <div class="fav-loading link-category-picker__loading" role="status" aria-live="polite">
+      <span class="fav-spinner" aria-hidden="true"></span>
+      <span>Loading categories...</span>
+    </div>
+  } @else if (loadError(); as message) {
+    <div class="fav-alert fav-alert--danger link-category-picker__alert" role="alert">
+      <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+      <div class="fav-alert__body">
+        <p class="link-category-picker__alert-message">{{ message }}</p>
+        <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reload()">
+          Try again
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div
+      class="link-category-picker__field fav-tag-input"
+      [class.is-disabled]="disabled() || creating()"
+      (click)="focusInputOnContainerClick($event)"
+    >
+      @if (selectedCategory(); as current) {
+        <i [class]="icons.Category" class="link-category-picker__field-icon" aria-hidden="true"></i>
+      }
+      <input
+        #categoryInput
+        class="fav-tag-input__field"
+        type="text"
+        autocomplete="off"
+        maxlength="50"
+        role="combobox"
+        aria-autocomplete="list"
+        [attr.aria-describedby]="inputError() ? inputErrorId : helpId"
+        [attr.aria-controls]="suggestionsId"
+        [attr.aria-expanded]="suggestions().length > 0 || canCreateFromInput() ? 'true' : 'false'"
+        [id]="inputId"
+        placeholder="No category — type to search or create"
+        [value]="displayValue()"
+        [disabled]="disabled() || creating()"
+        (input)="onInput($event)"
+        (keydown)="onKeyDown($event)"
+        (blur)="onBlur()"
+      />
+      @if (selectedCategory()) {
+        <button
+          type="button"
+          class="link-category-picker__clear"
+          aria-label="Clear category"
+          [disabled]="disabled() || creating()"
+          (click)="clearSelection()"
+        >
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+
+    <p class="link-category-picker__help fav-help" [id]="helpId">
+      Press Enter to pick a category. A new name creates one.
+    </p>
+
+    @if (inputError(); as message) {
+      <span class="fav-field-error" [id]="inputErrorId">{{ message }}</span>
+    }
+
+    @if (suggestions().length > 0 || canCreateFromInput()) {
+      <ul
+        class="link-category-picker__suggestions"
+        role="listbox"
+        [id]="suggestionsId"
+        aria-label="Category suggestions"
+      >
+        @for (category of suggestions(); track trackById($index, category)) {
+          <li role="option" [attr.aria-selected]="selectedCategoryId() === category.id">
+            <button
+              type="button"
+              class="link-category-picker__suggestion"
+              [class.is-selected]="selectedCategoryId() === category.id"
+              [disabled]="disabled() || creating()"
+              (click)="selectSuggestion(category)"
+            >
+              <i [class]="icons.Category" aria-hidden="true"></i>
+              <span>{{ category.name }}</span>
+            </button>
+          </li>
+        }
+        @if (canCreateFromInput()) {
+          <li role="option">
+            <span class="link-category-picker__suggestion link-category-picker__suggestion--create">
+              <i [class]="icons.AddLink" aria-hidden="true"></i>
+              <span>
+                Press Enter to create <strong>{{ (inputValue() ?? '').trim() }}</strong>
+              </span>
+              @if (creating()) {
+                <span class="fav-spinner" aria-hidden="true"></span>
+                <span class="fav-sr-only">Creating category...</span>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

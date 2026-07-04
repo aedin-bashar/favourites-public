@@ -1,0 +1,7 @@
+.right-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-3);
+  width: var(--fav-rail-width);
+  flex-shrink: 0;
+}

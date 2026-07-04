@@ -1,0 +1,153 @@
+// Settings page style foundation.
+// Source: docs/UI_DESIGN_GUIDE.md §19 ("Settings Page") and
+// `design/Prompt Result 6 Tags Categories Settings Pages.png`.
+//
+// Composes panel sections (Profile, Account & Security, Preferences) with
+// a section title row and a form grid inside each. Each section is a
+// `.fav-settings-section` rendered on a `.fav-panel`-like surface.
+
+@use '../tokens-breakpoints' as bp;
+
+.fav-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-6);
+}
+
+// --- Section --------------------------------------------------------------
+
+.fav-settings-section {
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+  padding: var(--fav-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-4);
+
+  @include bp.up(md) {
+    padding: var(--fav-space-6);
+  }
+}
+
+.fav-settings-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-1);
+  padding-bottom: var(--fav-space-3);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+.fav-settings-section__title {
+  margin: 0;
+  font-size: var(--fav-text-section-size);
+  font-weight: var(--fav-text-section-weight);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-snug);
+}
+
+.fav-settings-section__description {
+  margin: 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+.fav-settings-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-gap-stack);
+}
+
+.fav-settings-section__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fav-space-3);
+  padding-top: var(--fav-space-3);
+  border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+
+  @include bp.down(sm) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    .fav-btn { width: 100%; }
+  }
+}
+
+// --- Two-column field grid (desktop only) ---------------------------------
+// Used for "display name + email" rows in the Profile section.
+
+.fav-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--fav-space-4);
+
+  @include bp.up(md) {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--fav-space-5);
+  }
+}
+
+.fav-settings-grid__full {
+  @include bp.up(md) {
+    grid-column: 1 / -1;
+  }
+}
+
+// --- Inline preference row -----------------------------------------------
+// A label + control on the same line, separated. Used for Preferences
+// (theme, default view, links per page, open links behavior).
+
+.fav-settings-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-2);
+  padding: var(--fav-space-3) 0;
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+
+  &:last-child { border-bottom: 0; }
+
+  @include bp.up(md) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fav-space-5);
+  }
+}
+
+.fav-settings-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.fav-settings-row__label {
+  font-size: var(--fav-font-size-md);
+  font-weight: var(--fav-font-weight-semibold);
+  color: var(--fav-color-text-heading);
+}
+
+.fav-settings-row__help {
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+.fav-settings-row__control {
+  flex: 0 0 auto;
+
+  @include bp.up(md) {
+    min-width: 14rem;
+  }
+}
+
+// --- Danger zone ----------------------------------------------------------
+// Section variant used for destructive actions (delete account, sign out
+// everywhere). Keeps the destructive emphasis visible without screaming.
+
+.fav-settings-section--danger {
+  border-color: rgba(220, 53, 69, 0.4);
+
+  .fav-settings-section__title {
+    color: var(--fav-color-danger);
+  }
+}

@@ -1,0 +1,96 @@
+// Responsive breakpoint tokens — UI_DESIGN_GUIDE.md §6, §7, §8.
+//
+// Values are intentionally aligned with Bootstrap 5.3's defaults so our
+// custom queries and Bootstrap's utility classes never disagree about
+// where breakpoints are. CSS custom properties cannot be used in @media
+// queries, so these are exposed as SCSS variables. Consume from component
+// SCSS like this:
+//
+//   @use '../../../styles/tokens-breakpoints' as bp;
+//
+//   .my-thing {
+//     @include bp.up(lg)   { ... }   // ≥ 992px (desktop)
+//     @include bp.down(md) { ... }   // < 768px (mobile + tiny tablet)
+//     @include bp.only(md) { ... }   // 768px–991.98px (tablet only)
+//   }
+//
+// Semantic groupings used across this app:
+//   - mobile  = below `lg` (the breakpoint where the authenticated shell
+//               switches from sidebar+topbar to mobile header + bottom nav).
+//   - tablet  = `md` only (between `md` inclusive and `lg` exclusive).
+//   - desktop = `lg` and above.
+
+@use 'sass:map';
+@use 'sass:math';
+
+$breakpoints: (
+  sm:  576px,
+  md:  768px,
+  lg:  992px,
+  xl:  1200px,
+  xxl: 1400px,
+) !default;
+
+// --- Internal helpers -------------------------------------------------------
+
+@function _min($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error "Unknown breakpoint `#{$name}`. Allowed: #{map.keys($breakpoints)}.";
+  }
+  @return map.get($breakpoints, $name);
+}
+
+// Subtract 0.02px so a max-width query and a min-width query at the same
+// named breakpoint never overlap (matches Bootstrap's `breakpoint-max`).
+@function _max($name) {
+  @return _min($name) - 0.02px;
+}
+
+// --- Mixins -----------------------------------------------------------------
+
+/// Apply rules at or above the named breakpoint.
+@mixin up($name) {
+  @media (min-width: _min($name)) { @content; }
+}
+
+/// Apply rules strictly below the named breakpoint.
+@mixin down($name) {
+  @media (max-width: _max($name)) { @content; }
+}
+
+/// Apply rules between two named breakpoints, inclusive on lower, exclusive on upper.
+@mixin between($lower, $upper) {
+  @media (min-width: _min($lower)) and (max-width: _max($upper)) { @content; }
+}
+
+/// Apply rules inside the band of a single named breakpoint.
+/// `only(md)` = ≥768px and <992px.
+@mixin only($name) {
+  $keys: map.keys($breakpoints);
+  $index: index($keys, $name);
+  @if $index == null {
+    @error "Unknown breakpoint `#{$name}`. Allowed: #{$keys}.";
+  }
+  @if $index < length($keys) {
+    $next: nth($keys, $index + 1);
+    @include between($name, $next) { @content; }
+  } @else {
+    // Last breakpoint — no upper bound.
+    @include up($name) { @content; }
+  }
+}
+
+// --- Convenience semantic aliases ------------------------------------------
+//
+// These wrap the most-used app-level groupings so component code reads
+// at the level the design guide thinks at, not at named-breakpoint level.
+
+/// Below the `lg` breakpoint — phones and small tablets, where the
+/// authenticated mobile shell renders.
+@mixin mobile-only { @include down(lg) { @content; } }
+
+/// At or above the `lg` breakpoint — the authenticated desktop shell.
+@mixin desktop-only { @include up(lg) { @content; } }
+
+/// Tablets between md (768px) and lg (992px).
+@mixin tablet-only { @include only(md) { @content; } }

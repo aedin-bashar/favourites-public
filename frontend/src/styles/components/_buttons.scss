@@ -1,0 +1,168 @@
+// Reusable button styles — UI_DESIGN_GUIDE.md §11.
+// Variants: primary, secondary, outline, danger, warning, icon.
+// Sizes:    sm, md (default), lg.
+// All variants share the .fav-btn base so heights and spacing stay consistent.
+
+.fav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fav-space-2);
+  height: var(--fav-control-height);
+  padding: 0 var(--fav-space-4);
+  border: var(--fav-border-width-thin) solid transparent;
+  border-radius: var(--fav-radius-md);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--fav-font-size-md);
+  font-weight: var(--fav-font-weight-semibold);
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background-color 120ms ease, color 120ms ease,
+              border-color 120ms ease, box-shadow 120ms ease;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fav-border-focus-ring);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+// --- Sizes -------------------------------------------------------------------
+
+.fav-btn--sm {
+  height: 2rem;
+  padding-inline: var(--fav-space-3);
+  font-size: var(--fav-font-size-sm);
+}
+
+.fav-btn--lg {
+  height: 3rem;
+  padding-inline: var(--fav-space-5);
+  font-size: var(--fav-font-size-lg);
+}
+
+.fav-btn--block {
+  display: flex;
+  width: 100%;
+}
+
+// --- Variants ----------------------------------------------------------------
+
+.fav-btn--primary {
+  background-color: var(--fav-color-primary);
+  color: var(--fav-color-on-primary);
+  border-color: var(--fav-color-primary);
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: var(--fav-color-primary-dark);
+    border-color: var(--fav-color-primary-dark);
+    color: var(--fav-color-on-primary);
+  }
+}
+
+.fav-btn--secondary {
+  background-color: var(--fav-color-surface-alt);
+  color: var(--fav-color-text-heading);
+  border-color: var(--fav-color-border);
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: var(--fav-color-surface);
+    border-color: var(--fav-color-text-muted);
+    color: var(--fav-color-text-heading);
+  }
+}
+
+.fav-btn--outline {
+  background-color: transparent;
+  color: var(--fav-color-primary);
+  border-color: var(--fav-color-primary);
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: var(--fav-color-primary-soft);
+    color: var(--fav-color-primary-dark);
+    border-color: var(--fav-color-primary-dark);
+  }
+}
+
+.fav-btn--ghost {
+  background-color: transparent;
+  color: var(--fav-color-text-body);
+  border-color: transparent;
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: var(--fav-color-surface-alt);
+    color: var(--fav-color-text-heading);
+  }
+}
+
+.fav-btn--danger {
+  background-color: var(--fav-color-danger);
+  color: var(--fav-color-on-danger);
+  border-color: var(--fav-color-danger);
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: #b02a37;
+    border-color: #b02a37;
+    color: var(--fav-color-on-danger);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+}
+
+.fav-btn--warning {
+  background-color: var(--fav-color-warning);
+  color: var(--fav-color-on-warning);
+  border-color: var(--fav-color-warning);
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: #d68910;
+    border-color: #d68910;
+    color: var(--fav-color-on-warning);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.30);
+  }
+}
+
+// --- Icon-only button --------------------------------------------------------
+// Compact square/circular icon button. Requires aria-label (UI guide §17, §18).
+
+.fav-btn--icon {
+  width: var(--fav-control-height);
+  height: var(--fav-control-height);
+  padding: 0;
+  border-radius: var(--fav-radius-md);
+}
+
+.fav-btn--icon-round {
+  border-radius: var(--fav-radius-pill);
+}
+
+// --- Button group (toolbars) -------------------------------------------------
+
+.fav-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fav-space-2);
+  flex-wrap: wrap;
+}

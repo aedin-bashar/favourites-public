@@ -1,0 +1,81 @@
+// Dark theme — token overrides applied when the user preference
+// (Settings → Preferences → Theme) resolves to "dark", either directly or
+// via "System" + `prefers-color-scheme: dark`.
+//
+// UserPreferencesService sets `data-fav-theme` on <html>; everything below
+// only remaps the design tokens from `_tokens-colors.scss` /
+// `_tokens-radii-shadows.scss`, so components keep working untouched.
+// Navy-based palette derived from the light theme's heading navy (#061B3A)
+// with the brand teal lightened for contrast on dark surfaces.
+
+html[data-fav-theme='dark'] {
+  // Surfaces
+  --fav-color-bg-page: #0B1220;
+  --fav-color-surface: #121C2E;
+  --fav-color-surface-alt: #172236;
+
+  // Borders & dividers
+  --fav-color-border: #26344D;
+
+  // Text
+  --fav-color-text-heading: #F1F5FB;
+  --fav-color-text-body: #C7D2E2;
+  --fav-color-text-muted: #8CA0BA;
+
+  // Brand / primary (teal, lightened for dark surfaces)
+  --fav-color-primary: #2FB6C6;
+  --fav-color-primary-dark: #5BC8D5;
+  --fav-color-primary-soft: #0F333C;
+
+  // Semantic
+  --fav-color-info: #5B9BFF;
+  --fav-color-success: #34B378;
+  --fav-color-warning: #F5B04A;
+  --fav-color-danger: #E5606D;
+
+  // On-color text — primary buttons flip to dark text on the light teal
+  --fav-color-on-primary: #04191D;
+  --fav-color-on-danger: #FFFFFF;
+  --fav-color-on-warning: #1F1300;
+  --fav-color-on-success: #FFFFFF;
+  --fav-color-on-info: #FFFFFF;
+
+  // Tile icon accents — dark washes with lightened foregrounds
+  --fav-color-tile-icon-purple-bg: #2A2247;
+  --fav-color-tile-icon-purple-fg: #B195F5;
+
+  --fav-color-tile-icon-indigo-bg: #232A4E;
+  --fav-color-tile-icon-indigo-fg: #97A5F0;
+
+  --fav-color-tile-icon-teal-bg: #0F333C;
+  --fav-color-tile-icon-teal-fg: #4CC4D2;
+
+  --fav-color-tile-icon-sky-bg: #10304A;
+  --fav-color-tile-icon-sky-fg: #55B4E8;
+
+  --fav-color-tile-icon-amber-bg: #3B2C10;
+  --fav-color-tile-icon-amber-fg: #F0B45C;
+
+  --fav-color-tile-icon-rose-bg: #3E1B23;
+  --fav-color-tile-icon-rose-fg: #F0718B;
+
+  --fav-color-tile-icon-lime-bg: #263311;
+  --fav-color-tile-icon-lime-fg: #A3CE4E;
+
+  --fav-color-tile-icon-green-bg: #10331F;
+  --fav-color-tile-icon-green-fg: #4CC482;
+
+  // Focus ring re-tinted to the dark-theme teal
+  --fav-border-focus-ring: 0 0 0 0.2rem rgba(47, 182, 198, 0.35);
+
+  // Shadows — deeper, since light shadows vanish on dark backgrounds
+  --fav-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --fav-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3),
+                   0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  --fav-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35),
+                   0 2px 4px -2px rgba(0, 0, 0, 0.35);
+  --fav-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45),
+                   0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --fav-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5),
+                   0 8px 10px -6px rgba(0, 0, 0, 0.45);
+}

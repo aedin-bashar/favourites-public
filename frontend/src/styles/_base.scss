@@ -1,0 +1,161 @@
+// Base application styles — background, surfaces, borders, text
+// Built on top of the design tokens (`_tokens-*.scss`).
+// Source: docs/UI_DESIGN_GUIDE.md §4, §5, §10, §18.
+//
+// This is the minimal global layer. Component-level styles live with
+// the components they belong to. Bootstrap sits between the tokens and these resets.
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  // Keep root font size at the user agent default — supports zoom and
+  // avoids viewport-based scaling per UI guide §5.
+  font-size: 100%;
+}
+
+html[data-fav-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-fav-theme='dark'] {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--fav-font-family-sans);
+  font-size: var(--fav-font-size-base);
+  font-weight: var(--fav-font-weight-regular);
+  line-height: var(--fav-line-height-base);
+  letter-spacing: var(--fav-letter-spacing-base);
+  color: var(--fav-color-text-body);
+  background-color: var(--fav-color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+// --- Headings ----------------------------------------------------------------
+// Default heading color is the dark-navy heading token; sizes match the
+// typography role tokens.
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 var(--fav-space-3);
+  color: var(--fav-color-text-heading);
+  font-weight: var(--fav-font-weight-bold);
+  line-height: var(--fav-line-height-tight);
+  letter-spacing: var(--fav-letter-spacing-base);
+}
+
+h1 { font-size: var(--fav-text-app-h1-size); font-weight: var(--fav-text-app-h1-weight); }
+h2 { font-size: var(--fav-text-section-size); font-weight: var(--fav-text-section-weight); }
+h3 { font-size: var(--fav-text-card-title-size); font-weight: var(--fav-text-card-title-weight); }
+h4 { font-size: var(--fav-font-size-lg); font-weight: var(--fav-font-weight-semibold); }
+h5 { font-size: var(--fav-font-size-md); font-weight: var(--fav-font-weight-semibold); }
+h6 { font-size: var(--fav-font-size-sm); font-weight: var(--fav-font-weight-semibold); }
+
+p {
+  margin: 0 0 var(--fav-space-4);
+  color: var(--fav-color-text-body);
+  line-height: var(--fav-line-height-normal);
+}
+
+small,
+.fav-text-muted {
+  font-size: var(--fav-text-muted-size);
+  color: var(--fav-color-text-muted);
+}
+
+strong, b {
+  font-weight: var(--fav-font-weight-semibold);
+}
+
+// --- Links -------------------------------------------------------------------
+
+a {
+  color: var(--fav-color-primary);
+  text-decoration: none;
+  transition: color 120ms ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--fav-color-primary-dark);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fav-border-focus-ring);
+    border-radius: var(--fav-radius-xs);
+  }
+}
+
+// --- Surfaces ----------------------------------------------------------------
+// Utility classes for plain background/surface containers. Bootstrap card
+// styles will layer on top of these once the framework is wired.
+
+.fav-surface {
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+  box-shadow: var(--fav-shadow-sm);
+}
+
+.fav-surface--alt {
+  background-color: var(--fav-color-surface-alt);
+}
+
+.fav-surface--flat {
+  box-shadow: var(--fav-shadow-none);
+}
+
+// --- Dividers ----------------------------------------------------------------
+
+hr,
+.fav-divider {
+  border: 0;
+  height: var(--fav-border-width-thin);
+  background-color: var(--fav-color-border);
+  margin: var(--fav-space-5) 0;
+}
+
+// --- Focus -------------------------------------------------------------------
+// Global focus-visible style for interactive elements that don't have a
+// component-specific treatment. UI guide §18 — focus must always be visible.
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--fav-border-focus-ring);
+}
+
+// --- Selection ---------------------------------------------------------------
+
+::selection {
+  background-color: var(--fav-color-primary-soft);
+  color: var(--fav-color-text-heading);
+}
+
+// --- Visually hidden (screen-reader only) ------------------------------------
+// Used for accessible labels on icon-only buttons per UI guide §17, §18.
+
+.fav-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

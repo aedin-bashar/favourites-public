@@ -1,0 +1,50 @@
+// Reusable landing-page section — per UI_DESIGN_GUIDE.md §6, §7.
+
+:host {
+  display: block;
+}
+
+.landing-section {
+  background-color: var(--fav-color-bg-page);
+  padding-block: var(--fav-gap-section-large);
+
+  &--surface {
+    background-color: var(--fav-color-surface);
+  }
+
+  &--alt {
+    background-color: var(--fav-color-surface-alt);
+  }
+
+  &--compact {
+    padding-block: var(--fav-gap-section);
+  }
+
+  &--spacious {
+    padding-block: var(--fav-space-10);
+  }
+
+  &__inner {
+    max-width: var(--fav-page-max-width);
+    margin: 0 auto;
+    padding-inline: var(--fav-page-padding-x);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .landing-section {
+    padding-block: var(--fav-gap-section);
+
+    &--compact {
+      padding-block: var(--fav-space-5);
+    }
+
+    &--spacious {
+      padding-block: var(--fav-gap-section-large);
+    }
+
+    &__inner {
+      padding-inline: var(--fav-page-padding-x-sm);
+    }
+  }
+}

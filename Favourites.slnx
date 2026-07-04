@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Favourites.Api/Favourites.Api.csproj" />
+    <Project Path="src/Favourites.Application/Favourites.Application.csproj" />
+    <Project Path="src/Favourites.Domain/Favourites.Domain.csproj" />
+    <Project Path="src/Favourites.Infrastructure/Favourites.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Favourites.IntegrationTests/Favourites.IntegrationTests.csproj" />
+    <Project Path="tests/Favourites.UnitTests/Favourites.UnitTests.csproj" />
+  </Folder>
+</Solution>

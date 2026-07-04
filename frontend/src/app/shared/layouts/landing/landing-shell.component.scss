@@ -1,0 +1,20 @@
+// Landing shell — wraps the full landing page experience.
+// Source: docs/UI_DESIGN_GUIDE.md §7, §19.
+
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.landing-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--fav-color-bg-page);
+
+  &__main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+}

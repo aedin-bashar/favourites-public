@@ -1,0 +1,13 @@
+<header class="landing-header" role="banner">
+  <div class="landing-header__inner">
+    <a class="landing-header__brand" routerLink="/" aria-label="Favourites home">
+      <i [class]="icons.Heart" class="landing-header__brand-mark" aria-hidden="true"></i>
+      <span class="landing-header__brand-name">{{ productName() }}</span>
+    </a>
+
+    <div class="landing-header__actions">
+      <a class="landing-header__signin" routerLink="/login">Sign in</a>
+      <a class="landing-header__cta" routerLink="/register">Register</a>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,105 @@
+<app-auth-layout>
+  <ng-container ngProjectAs="[authLayoutHeading]">Welcome back</ng-container>
+  <ng-container ngProjectAs="[authLayoutSubheading]">
+    Sign in to your Favourites account.
+  </ng-container>
+
+  <form class="fav-form login-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    @if (serverError(); as message) {
+      <div class="fav-alert fav-alert--danger" role="alert">
+        <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+        <div class="fav-alert__body">{{ message }}</div>
+      </div>
+    }
+
+    <div class="fav-field">
+      <label class="fav-label" for="login-email">
+        Email
+        <span class="fav-label__required" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="login-email"
+        class="fav-input"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        required
+        formControlName="email"
+        [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched"
+        [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched ? 'true' : null"
+        aria-describedby="login-email-error"
+      />
+      @if (
+        form.controls.email.touched &&
+        (form.controls.email.hasError('required') || form.controls.email.hasError('blank'))
+      ) {
+        <span id="login-email-error" class="fav-field-error">Enter your email address.</span>
+      } @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+        <span id="login-email-error" class="fav-field-error">
+          Use an email address like name@example.com.
+        </span>
+      }
+    </div>
+
+    <div class="fav-field">
+      <label class="fav-label" for="login-password">
+        Password
+        <span class="fav-label__required" aria-hidden="true">*</span>
+      </label>
+      <div class="fav-input-group fav-input-group--icon-trailing">
+        <input
+          id="login-password"
+          class="fav-input"
+          [type]="showPassword() ? 'text' : 'password'"
+          autocomplete="current-password"
+          required
+          formControlName="password"
+          [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+          [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched ? 'true' : null"
+          aria-describedby="login-password-error"
+        />
+        <button
+          type="button"
+          class="fav-input-group__btn"
+          (click)="showPassword.set(!showPassword())"
+          [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+          [attr.aria-pressed]="showPassword()"
+          tabindex="-1"
+        >
+          <i [class]="showPassword() ? icons.EyeHide : icons.EyeShow" aria-hidden="true"></i>
+        </button>
+      </div>
+      @if (
+        form.controls.password.touched &&
+        (form.controls.password.hasError('required') || form.controls.password.hasError('blank'))
+      ) {
+        <span id="login-password-error" class="fav-field-error">Enter your password.</span>
+      }
+    </div>
+
+    <div class="login-form__row">
+      <label class="fav-check">
+        <input type="checkbox" formControlName="rememberMe" />
+        <span>Remember me</span>
+      </label>
+      <a class="login-form__forgot" routerLink="/forgot-password">Forgot password?</a>
+    </div>
+
+    <button
+      type="submit"
+      class="fav-btn fav-btn--primary fav-btn--block"
+      [class.is-loading]="submitting()"
+      [disabled]="submitting()"
+    >
+      @if (submitting()) {
+        <span class="fav-spinner" aria-hidden="true"></span>
+        <span class="fav-sr-only">Signing in…</span>
+      }
+      <span class="fav-btn__label">Sign in</span>
+    </button>
+  </form>
+
+  <ng-container ngProjectAs="[authLayoutFooter]">
+    New here? <a routerLink="/register">Create an account</a>
+  </ng-container>
+</app-auth-layout>

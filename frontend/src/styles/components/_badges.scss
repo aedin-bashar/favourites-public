@@ -1,0 +1,128 @@
+// Reusable badge styles for tags and categories — UI_DESIGN_GUIDE.md §14.
+// Soft tinted backgrounds, readable text, small but not tiny.
+
+.fav-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  min-height: 1.5rem;
+  border-radius: var(--fav-radius-pill);
+  background-color: var(--fav-color-surface-alt);
+  color: var(--fav-color-text-body);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  font-size: var(--fav-font-size-xs);
+  font-weight: var(--fav-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+// --- Tag variants -----------------------------------------------------------
+// Soft tinted backgrounds drawn from the guide's allowed palette:
+// blue, teal, green, purple, amber.
+
+.fav-badge--tag {
+  // Default tag = soft teal (primary).
+  background-color: var(--fav-color-primary-soft);
+  color: var(--fav-color-primary-dark);
+  border-color: transparent;
+}
+
+.fav-badge--tag-blue {
+  background-color: #E7F1FF;
+  color: #0A58CA;
+}
+
+.fav-badge--tag-green {
+  background-color: #E4F5EB;
+  color: #146C43;
+}
+
+.fav-badge--tag-purple {
+  background-color: #EFEAFE;
+  color: #5B3FD1;
+}
+
+.fav-badge--tag-amber {
+  background-color: #FEF3CD;
+  color: #8A5A00;
+}
+
+// --- Category badge ---------------------------------------------------------
+// Neutral surface badge with a folder icon (icon supplied by template).
+
+.fav-badge--category {
+  background-color: var(--fav-color-surface);
+  color: var(--fav-color-text-heading);
+  border-color: var(--fav-color-border);
+  padding-inline: 0.625rem;
+}
+
+// --- Count pill -------------------------------------------------------------
+
+.fav-badge--count {
+  min-height: 1.25rem;
+  padding: 0 0.5rem;
+  background-color: var(--fav-color-surface-alt);
+  color: var(--fav-color-text-muted);
+  font-weight: var(--fav-font-weight-semibold);
+  border-color: transparent;
+}
+
+// --- Semantic state badges --------------------------------------------------
+
+.fav-badge--success {
+  background-color: #E4F5EB;
+  color: #146C43;
+  border-color: transparent;
+}
+
+.fav-badge--warning {
+  background-color: #FEF3CD;
+  color: #8A5A00;
+  border-color: transparent;
+}
+
+.fav-badge--danger {
+  background-color: #FBE2E5;
+  color: #B02A37;
+  border-color: transparent;
+}
+
+// --- Removable tag chip (form inputs) --------------------------------------
+
+.fav-badge--removable {
+  padding-inline-end: 0.25rem;
+
+  .fav-badge__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin-inline-start: 0.125rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--fav-radius-pill);
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    opacity: 0.7;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 1;
+      outline: none;
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+  }
+}
+
+// --- Badge list (wraps gracefully) -----------------------------------------
+
+.fav-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  align-items: center;
+}

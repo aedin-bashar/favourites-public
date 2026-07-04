@@ -1,0 +1,126 @@
+// Saved-link card.
+// Builds on the shared .fav-card surface; this file only holds the card's
+// internal layout (title/domain block, footer meta row, action group) and
+// the small visual treatments that aren't covered by the global utilities.
+
+.link-card {
+  gap: var(--fav-space-3);
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--fav-space-3);
+  }
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fav-space-1);
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: var(--fav-text-card-title-size);
+    font-weight: var(--fav-text-card-title-weight);
+    color: var(--fav-color-text-heading);
+    line-height: var(--fav-line-height-snug);
+    text-decoration: none;
+    word-break: break-word;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-primary-dark);
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--fav-border-focus-ring);
+      border-radius: var(--fav-radius-sm);
+    }
+  }
+
+  &__domain {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+    margin: 0;
+    color: var(--fav-color-text-muted);
+    font-size: var(--fav-font-size-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  &__favicon {
+    flex: 0 0 auto;
+    border-radius: 2px;
+  }
+
+  &__favicon-fallback {
+    flex: 0 0 auto;
+  }
+
+  &__archived {
+    flex: 0 0 auto;
+  }
+
+  &__description {
+    margin: 0;
+    color: var(--fav-color-text-body);
+    font-size: var(--fav-font-size-md);
+    line-height: var(--fav-line-height-normal);
+    // Clamp to keep cards uniform in a grid; full text remains accessible
+    // via the details view.
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__tags {
+    margin-top: calc(var(--fav-space-1) * -1);
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fav-space-3);
+    padding-top: var(--fav-space-3);
+    border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+    flex-wrap: wrap;
+  }
+
+  &__meta {
+    margin: 0;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--fav-space-2);
+    color: var(--fav-color-text-muted);
+    font-size: var(--fav-font-size-sm);
+  }
+
+  &__meta-label {
+    color: var(--fav-color-text-muted);
+    font-weight: var(--fav-font-weight-medium);
+  }
+
+  &__meta-separator {
+    color: var(--fav-color-border);
+  }
+
+  &__actions {
+    flex: 0 0 auto;
+  }
+
+  &__delete:hover:not(:disabled),
+  &__delete:focus-visible:not(:disabled) {
+    color: var(--fav-color-danger);
+    background-color: rgba(220, 53, 69, 0.08);
+  }
+}

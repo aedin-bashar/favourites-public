@@ -1,0 +1,8 @@
+// Register page — UI_DESIGN_GUIDE.md §12, §19 (Register page).
+// All shared styling comes from `.fav-form` / `.fav-input` / `.fav-btn`.
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-gap-stack);
+}

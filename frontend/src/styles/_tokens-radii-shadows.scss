@@ -1,0 +1,45 @@
+// Design tokens — borders, border radii, and shadows
+// Source: docs/UI_DESIGN_GUIDE.md §6, §10
+// Subtle borders, soft shadows, moderate rounded corners.
+
+:root {
+  // Border widths
+  --fav-border-width-thin:    1px;
+  --fav-border-width-regular: 1px;
+  --fav-border-width-thick:   2px;
+
+  // Border colors are defined in _tokens-colors.scss (--fav-color-border).
+  // Focus ring uses the primary color.
+  --fav-border-focus-ring:    0 0 0 0.2rem rgba(0, 124, 137, 0.25);
+
+  // Border radii — UI guide calls for 6-8px on cards, modals, panels.
+  --fav-radius-xs:   2px;     // small accents
+  --fav-radius-sm:   4px;     // inputs, buttons
+  --fav-radius-md:   6px;     // cards, modals (lower end of guide range)
+  --fav-radius-lg:   8px;     // cards, modals (upper end of guide range)
+  --fav-radius-xl:   12px;    // larger panels
+  --fav-radius-pill: 999px;   // pills, badges with rounded ends
+  --fav-radius-card: var(--fav-radius-lg); // canonical card/widget radius (§21)
+
+  // Shadows — soft and minimal per UI guide §10
+  --fav-shadow-none: none;
+
+  // xs — hairline elevation (hover on flat cards)
+  --fav-shadow-xs:   0 1px 2px 0 rgba(6, 27, 58, 0.04);
+
+  // sm — default card shadow
+  --fav-shadow-sm:   0 1px 2px 0 rgba(6, 27, 58, 0.04),
+                     0 1px 3px 0 rgba(6, 27, 58, 0.06);
+
+  // md — raised card / dropdown
+  --fav-shadow-md:   0 4px 6px -1px rgba(6, 27, 58, 0.06),
+                     0 2px 4px -2px rgba(6, 27, 58, 0.06);
+
+  // lg — modal / popover
+  --fav-shadow-lg:   0 10px 15px -3px rgba(6, 27, 58, 0.08),
+                     0 4px 6px -4px rgba(6, 27, 58, 0.06);
+
+  // xl — large modal / full-page overlay surface
+  --fav-shadow-xl:   0 20px 25px -5px rgba(6, 27, 58, 0.10),
+                     0 8px 10px -6px rgba(6, 27, 58, 0.06);
+}

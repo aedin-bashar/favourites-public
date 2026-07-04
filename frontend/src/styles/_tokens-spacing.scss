@@ -1,0 +1,41 @@
+// Design tokens — spacing scale and layout gaps
+// Source: docs/UI_DESIGN_GUIDE.md §6, §7, §8
+// Scale is based on 0.25rem (4px) units to align with Bootstrap's spacer.
+
+:root {
+  // Base spacing scale (1 unit = 0.25rem = 4px at default root font size)
+  --fav-space-0:  0;
+  --fav-space-1:  0.25rem;  //  4px
+  --fav-space-2:  0.5rem;   //  8px
+  --fav-space-3:  0.75rem;  // 12px
+  --fav-space-4:  1rem;     // 16px  — Bootstrap base spacer
+  --fav-space-5:  1.5rem;   // 24px
+  --fav-space-6:  2rem;     // 32px
+  --fav-space-7:  3rem;     // 48px
+  --fav-space-8:  4rem;     // 64px
+  --fav-space-9:  6rem;     // 96px
+  --fav-space-10: 8rem;     // 128px
+
+  // Semantic spacing tokens
+  --fav-gap-inline:        var(--fav-space-2);   // gap between inline elements (badges, icons)
+  --fav-gap-stack:         var(--fav-space-3);   // gap between stacked form fields
+  --fav-gap-card-padding:  var(--fav-space-5);   // card interior padding
+  --fav-gap-section:       var(--fav-space-7);   // gap between authenticated page sections
+  --fav-gap-section-large: var(--fav-space-9);   // gap between landing page sections
+
+  // Page layout
+  --fav-page-max-width:     1280px;   // landing page container max width
+  --fav-page-padding-x:     var(--fav-space-5);     // desktop horizontal page padding
+  --fav-page-padding-x-sm:  var(--fav-space-4);     // mobile horizontal page padding
+
+  // Authenticated app shell — see UI guide §7 and §21.13
+  --fav-sidebar-width:      272px;    // 260-280px range, picked the middle
+  --fav-topbar-height:      64px;
+  --fav-rail-width:         320px;    // right rail fixed width (desktop ≥1280px)
+  --fav-stat-card-height:   96px;     // stat card fixed height (see §21.5)
+  --fav-bottomnav-height:   64px;     // mobile bottom nav — keeps 44px+ touch targets
+
+  // Form & control sizing
+  --fav-control-height:     2.5rem;   // 40px — consistent input/button height
+  --fav-touch-target-min:   2.75rem;  // 44px — mobile minimum touch target
+}

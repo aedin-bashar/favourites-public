@@ -1,0 +1,159 @@
+// Authenticated app shell.
+// Single DOM tree; CSS media queries switch between desktop and mobile layouts.
+//
+// Desktop (≥768px):
+//   :host is display:flex (row)
+//   [sidebar fixed] | [column: topbar sticky + content-row]
+//   Content row: [main flex-1] | [rail fixed, only ≥1280px]
+//
+// Mobile (<768px):
+//   :host is display:flex flex-direction:column
+//   [mobile-header sticky] | [column: main] | [bottom-nav sticky]
+
+:host {
+  display: flex;
+  min-height: 100dvh;
+  background-color: var(--fav-color-bg-page);
+}
+
+.app-shell {
+  // ── Skip link ────────────────────────────────────────────────────────────
+  &__skip-link {
+    position: fixed;
+    top: var(--fav-space-3);
+    left: var(--fav-space-3);
+    z-index: 2000;
+    transform: translateY(calc(-100% - var(--fav-space-4)));
+    padding: var(--fav-space-2) var(--fav-space-3);
+    background-color: var(--fav-color-text-heading);
+    color: var(--fav-color-surface);
+    border-radius: var(--fav-radius-md);
+    box-shadow: var(--fav-shadow-md);
+    font-weight: var(--fav-font-weight-semibold);
+    text-decoration: none;
+    transition: transform 120ms ease;
+
+    &:focus-visible {
+      transform: translateY(0);
+      color: var(--fav-color-surface);
+      text-decoration: none;
+    }
+  }
+
+  // ── Desktop sidebar ───────────────────────────────────────────────────────
+  &__sidebar {
+    flex: 0 0 var(--fav-sidebar-width);
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
+  // ── Right body column ─────────────────────────────────────────────────────
+  &__column {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__topbar {
+    flex: 0 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  // ── Content row (main + rail) ─────────────────────────────────────────────
+  &__content {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  &__main {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--fav-space-5) var(--fav-page-padding-x);
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset var(--fav-border-focus-ring);
+    }
+  }
+
+  // Right rail — only visible at ≥1280px
+  &__rail {
+    flex: 0 0 var(--fav-rail-width);
+    padding: var(--fav-space-5) var(--fav-space-4) var(--fav-space-5) 0;
+    min-width: 0;
+
+    // Hide when nothing is projected (empty aside has no height impact)
+    &:empty {
+      display: none;
+    }
+  }
+
+  // ── Mobile chrome ─────────────────────────────────────────────────────────
+  &__mobile-header,
+  &__mobile-search,
+  &__bottom-nav {
+    display: none;
+  }
+}
+
+// ── Tablet (768px – 1279px): narrower sidebar, no rail ───────────────────────
+@media (min-width: 768px) and (max-width: 1279px) {
+  .app-shell {
+    &__sidebar {
+      flex-basis: 220px;
+    }
+
+    &__rail {
+      display: none;
+    }
+  }
+}
+
+// ── Mobile (<768px): swap to vertical mobile layout ───────────────────────────
+@media (max-width: 767px) {
+  :host {
+    flex-direction: column;
+  }
+
+  .app-shell {
+    &__sidebar,
+    &__topbar,
+    &__rail {
+      display: none;
+    }
+
+    &__mobile-header {
+      display: block;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      order: -1;
+    }
+
+    &__bottom-nav {
+      display: block;
+    }
+
+    &__mobile-search {
+      display: block;
+      padding: var(--fav-space-3) var(--fav-page-padding-x-sm);
+      background-color: var(--fav-color-surface);
+      border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+    }
+
+    &__column {
+      flex: 1 1 auto;
+    }
+
+    &__main {
+      padding: var(--fav-space-4) var(--fav-page-padding-x-sm);
+    }
+  }
+}

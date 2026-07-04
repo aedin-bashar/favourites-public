@@ -1,0 +1,9 @@
+<div class="landing-shell">
+  <app-landing-header [productName]="productName()" />
+
+  <main class="landing-shell__main" id="main-content">
+    <ng-content />
+  </main>
+
+  <app-landing-footer [productName]="productName()" />
+</div>

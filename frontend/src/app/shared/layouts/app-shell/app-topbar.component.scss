@@ -1,0 +1,38 @@
+// Global top bar. Layout: search (centre) | user menu (right).
+
+:host {
+  display: block;
+  background-color: var(--fav-color-surface);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--fav-space-4);
+  min-height: var(--fav-topbar-height);
+  padding: 0 var(--fav-space-5);
+
+  &__search {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+
+    // Keep the form itself capped so it looks centered, not edge-to-edge.
+    fav-app-search {
+      width: 100%;
+      max-width: 640px;
+    }
+  }
+
+  &__right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+  }
+}

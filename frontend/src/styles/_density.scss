@@ -1,0 +1,20 @@
+// Density modes — applied via `data-fav-density` on <html>, set by
+// UserPreferencesService from Settings → Preferences → Density.
+//
+// "Comfortable" is the token defaults from `_tokens-spacing.scss`;
+// "Compact" tightens the mid-range spacing steps (the ones component
+// padding/gaps are built from) plus control and stat-card heights.
+// The small steps (1-2) and the large landing-page steps (8-10) stay
+// untouched so hairline gaps and marketing sections keep their rhythm.
+
+html[data-fav-density='compact'] {
+  --fav-space-3: 0.5rem;    // 12px → 8px
+  --fav-space-4: 0.75rem;   // 16px → 12px
+  --fav-space-5: 1rem;      // 24px → 16px
+  --fav-space-6: 1.5rem;    // 32px → 24px
+  --fav-space-7: 2rem;      // 48px → 32px
+
+  --fav-gap-card-padding: var(--fav-space-4);
+  --fav-control-height: 2.25rem;   // 40px → 36px
+  --fav-stat-card-height: 84px;    // 96px → 84px
+}

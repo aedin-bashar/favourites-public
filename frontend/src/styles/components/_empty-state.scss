@@ -1,0 +1,79 @@
+// Reusable empty-state styles — UI_DESIGN_GUIDE.md §15.
+// Large simple icon, short heading, one helpful sentence, optional CTA.
+// Empty states should guide, not feel like errors.
+
+.fav-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-7) var(--fav-space-5);
+  color: var(--fav-color-text-body);
+}
+
+.fav-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--fav-radius-pill);
+  background-color: var(--fav-color-primary-soft);
+  color: var(--fav-color-primary);
+  font-size: 1.75rem;
+}
+
+.fav-empty-state__title {
+  margin: 0;
+  font-size: var(--fav-font-size-xl);
+  font-weight: var(--fav-font-weight-semibold);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-snug);
+}
+
+.fav-empty-state__message {
+  margin: 0;
+  max-width: 32rem;
+  color: var(--fav-color-text-muted);
+  font-size: var(--fav-font-size-md);
+  line-height: var(--fav-line-height-normal);
+}
+
+.fav-empty-state__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fav-space-3);
+  margin-top: var(--fav-space-2);
+}
+
+// Compact variant — for empty list rows inside cards/panels.
+.fav-empty-state--compact {
+  padding: var(--fav-space-5) var(--fav-space-3);
+  gap: var(--fav-space-2);
+
+  .fav-empty-state__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.125rem;
+  }
+
+  .fav-empty-state__title {
+    font-size: var(--fav-font-size-md);
+  }
+
+  .fav-empty-state__message {
+    font-size: var(--fav-font-size-sm);
+  }
+}
+
+// Subtle variant — neutral icon background (used when the empty state isn't
+// inviting a primary action, e.g. "No archived links yet").
+.fav-empty-state--subtle {
+  .fav-empty-state__icon {
+    background-color: var(--fav-color-surface-alt);
+    color: var(--fav-color-text-muted);
+  }
+}

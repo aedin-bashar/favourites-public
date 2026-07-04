@@ -1,0 +1,129 @@
+<div class="lp-wrap" aria-hidden="true">
+  <!-- Sidebar mock -->
+  <aside class="lp-sidebar">
+    <div class="lp-sidebar__brand">
+      <i [class]="icons.Heart" class="lp-sidebar__brand-icon"></i>
+      <span class="lp-sidebar__brand-name">Favourites</span>
+    </div>
+    <nav class="lp-sidebar__nav">
+      <span class="lp-sidebar__nav-item lp-sidebar__nav-item--active">
+        <i [class]="icons.Dashboard"></i>
+        <span>Dashboard</span>
+      </span>
+      <span class="lp-sidebar__nav-item">
+        <i [class]="icons.AllLinks"></i>
+        <span>All Links</span>
+      </span>
+      <span class="lp-sidebar__nav-item">
+        <i [class]="icons.Tags"></i>
+        <span>Tags</span>
+      </span>
+      <span class="lp-sidebar__nav-item">
+        <i [class]="icons.Categories"></i>
+        <span>Categories</span>
+      </span>
+      <span class="lp-sidebar__nav-item">
+        <i [class]="icons.Archived"></i>
+        <span>Archived</span>
+      </span>
+    </nav>
+  </aside>
+
+  <!-- Main dashboard panel -->
+  <div class="lp-main">
+    <!-- Top bar -->
+    <div class="lp-topbar">
+      <div class="lp-topbar__search">
+        <i [class]="icons.Search" class="lp-topbar__search-icon"></i>
+        <span class="lp-topbar__search-placeholder">Search your links…</span>
+      </div>
+      <div class="lp-topbar__avatar"></div>
+    </div>
+
+    <!-- Welcome -->
+    <div class="lp-welcome">
+      <span class="lp-welcome__title">Welcome, Bashar 👋</span>
+      <div class="lp-welcome__save">
+        <div class="lp-welcome__save-input"></div>
+        <div class="lp-welcome__save-btn">Save link</div>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="lp-stats">
+      <div class="lp-stat lp-stat--teal">
+        <span class="lp-stat__value">48</span>
+        <span class="lp-stat__label">Total links</span>
+      </div>
+      <div class="lp-stat lp-stat--indigo">
+        <span class="lp-stat__value">12</span>
+        <span class="lp-stat__label">Tags</span>
+      </div>
+      <div class="lp-stat lp-stat--amber">
+        <span class="lp-stat__value">6</span>
+        <span class="lp-stat__label">Categories</span>
+      </div>
+      <div class="lp-stat lp-stat--rose">
+        <span class="lp-stat__value">3</span>
+        <span class="lp-stat__label">Archived</span>
+      </div>
+    </div>
+
+    <!-- Recent links -->
+    <div class="lp-recent">
+      <span class="lp-recent__heading">Recently added</span>
+      <div class="lp-link-row">
+        <div class="lp-link-row__favicon"></div>
+        <div class="lp-link-row__meta">
+          <span class="lp-link-row__title">Angular routing guide</span>
+          <span class="lp-link-row__domain">angular.dev</span>
+        </div>
+        <div class="lp-link-row__tag lp-tag--teal">angular</div>
+      </div>
+      <div class="lp-link-row">
+        <div class="lp-link-row__favicon"></div>
+        <div class="lp-link-row__meta">
+          <span class="lp-link-row__title">EF Core migrations cheatsheet</span>
+          <span class="lp-link-row__domain">learn.microsoft.com</span>
+        </div>
+        <div class="lp-link-row__tag lp-tag--indigo">dotnet</div>
+      </div>
+      <div class="lp-link-row">
+        <div class="lp-link-row__favicon"></div>
+        <div class="lp-link-row__meta">
+          <span class="lp-link-row__title">SCSS @use guide</span>
+          <span class="lp-link-row__domain">sass-lang.com</span>
+        </div>
+        <div class="lp-link-row__tag lp-tag--amber">css</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right rail mock -->
+  <aside class="lp-rail">
+    <div class="lp-rail__widget">
+      <span class="lp-rail__widget-title">COMMON TAGS</span>
+      <div class="lp-rail__chip-row">
+        <span class="lp-rail__chip">angular</span>
+        <span class="lp-rail__chip">dotnet</span>
+        <span class="lp-rail__chip">css</span>
+      </div>
+      <div class="lp-rail__chip-row">
+        <span class="lp-rail__chip">learning</span>
+        <span class="lp-rail__chip">tools</span>
+      </div>
+    </div>
+    <div class="lp-rail__widget">
+      <span class="lp-rail__widget-title">QUICK ACCESS</span>
+      <div class="lp-rail__link-row">
+        <i [class]="icons.AllLinks"></i><span>All Links</span>
+      </div>
+      <div class="lp-rail__link-row">
+        <i [class]="icons.Tags"></i><span>Tags</span>
+      </div>
+      <div class="lp-rail__link-row">
+        <i [class]="icons.Archived"></i><span>Archived</span>
+      </div>
+    </div>
+  </aside>
+</div>

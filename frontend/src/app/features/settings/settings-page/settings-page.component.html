@@ -1,0 +1,493 @@
+<section class="settings-page">
+  <header class="settings-page__header fav-page-header">
+    <div class="fav-page-header__text">
+      <h1 class="fav-page-header__title">Settings</h1>
+      <p class="fav-page-header__subtitle">
+        Manage your account, preferences, and how Favourites works for you.
+      </p>
+    </div>
+    <div class="fav-page-header__actions settings-page__header-actions">
+      <button
+        type="button"
+        class="fav-btn fav-btn--outline"
+        (click)="resetPreferences()"
+        [disabled]="preferencesLoading() || preferencesSaving()"
+      >
+        <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>
+        <span>Reset changes</span>
+      </button>
+      <button
+        type="button"
+        class="fav-btn fav-btn--primary"
+        (click)="savePreferences()"
+        [class.is-loading]="preferencesSaving()"
+        [disabled]="preferencesLoading() || preferencesSaving() || !preferencesDirty()"
+      >
+        @if (preferencesSaving()) {
+          <span class="fav-spinner" aria-hidden="true"></span>
+        } @else {
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+        }
+        <span>Save changes</span>
+      </button>
+    </div>
+  </header>
+
+  @if (preferencesMessage(); as message) {
+    <p class="settings-page__status settings-page__status--success" role="status">
+      <i [class]="icons.Success" aria-hidden="true"></i>
+      <span>{{ message }}</span>
+    </p>
+  }
+
+  @if (preferencesError(); as message) {
+    <p class="settings-page__status settings-page__status--error" role="alert">
+      <i [class]="icons.Danger" aria-hidden="true"></i>
+      <span>{{ message }}</span>
+    </p>
+  }
+
+  <div class="settings-page__mobile-tabs">
+    <label class="fav-label" for="settings-mobile-section">Section</label>
+    <select
+      id="settings-mobile-section"
+      class="fav-select"
+      [value]="activeTab()"
+      (change)="onMobileTabChange($event)"
+    >
+      @for (tab of tabs; track tab.id) {
+        <option [value]="tab.id">{{ tab.label }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="settings-page__layout">
+    <aside class="settings-page__rail" aria-label="Settings sections">
+      <nav class="settings-page__tabs" aria-label="Settings tabs">
+        @for (tab of tabs; track tab.id) {
+          <a
+            class="settings-page__tab"
+            [class.is-active]="activeTab() === tab.id"
+            [class.settings-page__tab--danger]="tab.id === 'danger-zone'"
+            [attr.aria-current]="activeTab() === tab.id ? 'page' : null"
+            [href]="'#settings-' + tab.id"
+            (click)="setActiveTab(tab.id, $event)"
+          >
+            <i [class]="tab.icon" aria-hidden="true"></i>
+            <span>{{ tab.label }}</span>
+          </a>
+        }
+      </nav>
+
+      <div class="settings-page__rail-cards">
+        <section class="settings-page__mini-card" aria-labelledby="settings-storage-title">
+          <div class="settings-page__mini-card-title">
+            <i class="fa-regular fa-bookmark" aria-hidden="true"></i>
+            <h2 id="settings-storage-title">Your library</h2>
+          </div>
+          <p>
+            @if (summaryLoading()) {
+              Loading link usage...
+            } @else {
+              {{ usedLinks() }} saved {{ usedLinks() === 1 ? 'link' : 'links' }} (including archived)
+            }
+          </p>
+        </section>
+
+        <section class="settings-page__mini-card" aria-labelledby="settings-help-title">
+          <div class="settings-page__mini-card-title">
+            <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+            <h2 id="settings-help-title">Need help?</h2>
+          </div>
+          <p>Your data stays private and can be exported anytime.</p>
+        </section>
+      </div>
+    </aside>
+
+    <div class="settings-page__panels">
+      <section id="settings-profile" class="settings-page__panel" aria-labelledby="settings-profile-title">
+        <header class="settings-page__panel-header">
+          <div>
+            <h2 id="settings-profile-title">Profile</h2>
+            <p>Update your personal information.</p>
+          </div>
+        </header>
+
+        <form class="settings-page__profile" [formGroup]="profileForm" (ngSubmit)="updateProfile()" novalidate>
+          <div class="settings-page__avatar-block">
+            <div class="settings-page__avatar" aria-hidden="true">{{ avatarInitial() }}</div>
+          </div>
+
+          <div class="settings-page__profile-fields">
+            <div class="fav-field">
+              <label class="fav-label" for="settings-display-name">Display name</label>
+              <input
+                id="settings-display-name"
+                class="fav-input"
+                type="text"
+                autocomplete="name"
+                formControlName="displayName"
+                [class.is-invalid]="
+                  profileForm.controls.displayName.invalid && profileForm.controls.displayName.touched
+                "
+              />
+              @if (profileForm.controls.displayName.touched && profileForm.controls.displayName.hasError('required')) {
+                <span class="fav-field-error">Display name is required.</span>
+              } @else if (
+                profileForm.controls.displayName.touched &&
+                profileForm.controls.displayName.hasError('maxlength')
+              ) {
+                <span class="fav-field-error">Display name must be 200 characters or fewer.</span>
+              }
+            </div>
+
+            <div class="fav-field">
+              <label class="fav-label" for="settings-email">Email</label>
+              <input
+                id="settings-email"
+                class="fav-input"
+                type="email"
+                autocomplete="email"
+                formControlName="email"
+                readonly
+              />
+            </div>
+
+            <div class="settings-page__panel-actions">
+              <button
+                type="submit"
+                class="fav-btn fav-btn--primary"
+                [class.is-loading]="profileSaving()"
+                [disabled]="profileSaving()"
+              >
+                @if (profileSaving()) {
+                  <span class="fav-spinner" aria-hidden="true"></span>
+                }
+                <span>Update profile</span>
+              </button>
+            </div>
+
+            @if (profileMessage(); as message) {
+              <p class="settings-page__inline-status settings-page__inline-status--success" role="status">
+                {{ message }}
+              </p>
+            }
+            @if (profileError(); as message) {
+              <p class="settings-page__inline-status settings-page__inline-status--error" role="alert">
+                {{ message }}
+              </p>
+            }
+          </div>
+        </form>
+      </section>
+
+      <section id="settings-preferences" class="settings-page__panel" aria-labelledby="settings-preferences-title">
+        <header class="settings-page__panel-header">
+          <div>
+            <h2 id="settings-preferences-title">Preferences</h2>
+            <p>Customize your Favourites experience.</p>
+          </div>
+        </header>
+
+        <div class="settings-page__setting-list" [formGroup]="settingsForm">
+          <div class="settings-page__setting-row">
+            <div class="settings-page__setting-label">
+              <i class="fa-solid fa-sun" aria-hidden="true"></i>
+              <span>Theme</span>
+            </div>
+            <div class="settings-page__segmented" role="group" aria-label="Theme">
+              @for (option of themeOptions; track option.value) {
+                <button
+                  type="button"
+                  [class.is-active]="settingsForm.controls.theme.value === option.value"
+                  (click)="setTheme(option.value)"
+                >
+                  {{ option.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="settings-page__setting-row">
+            <div class="settings-page__setting-label">
+              <i class="fa-solid fa-grip-lines" aria-hidden="true"></i>
+              <span>Density</span>
+            </div>
+            <div class="settings-page__segmented" role="group" aria-label="Density">
+              @for (option of densityOptions; track option.value) {
+                <button
+                  type="button"
+                  [class.is-active]="settingsForm.controls.density.value === option.value"
+                  (click)="setDensity(option.value)"
+                >
+                  {{ option.label }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings-link-defaults" class="settings-page__panel" aria-labelledby="settings-link-defaults-title">
+        <header class="settings-page__panel-header">
+          <div>
+            <h2 id="settings-link-defaults-title">Link defaults</h2>
+            <p>Choose how new links are saved.</p>
+          </div>
+        </header>
+
+        <div class="settings-page__setting-list" [formGroup]="settingsForm">
+          <div class="settings-page__setting-row">
+            <div class="settings-page__setting-label">
+              <i class="fa-regular fa-folder" aria-hidden="true"></i>
+              <span>Default category</span>
+            </div>
+            <select class="fav-select settings-page__select" formControlName="defaultCategoryId">
+              <option [ngValue]="null">Uncategorized</option>
+              @for (category of categories(); track category.id) {
+                <option [ngValue]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+
+          <label class="settings-page__switch-row">
+            <span class="settings-page__setting-label">
+              <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+              <span>Suggest title from URL</span>
+            </span>
+            <input type="checkbox" role="switch" formControlName="autoExtractTitle" />
+          </label>
+
+          <label class="settings-page__switch-row">
+            <span class="settings-page__setting-label">
+              <i class="fa-regular fa-image" aria-hidden="true"></i>
+              <span>Show favicon</span>
+            </span>
+            <input type="checkbox" role="switch" formControlName="showFavicon" />
+          </label>
+
+          <label class="settings-page__switch-row">
+            <span class="settings-page__setting-label">
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+              <span>Open in new tab</span>
+            </span>
+            <input type="checkbox" role="switch" formControlName="openInNewTab" />
+          </label>
+
+          <label class="settings-page__switch-row">
+            <span class="settings-page__setting-label">
+              <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+              <span>Confirm before delete</span>
+            </span>
+            <input type="checkbox" role="switch" formControlName="confirmBeforeDelete" />
+          </label>
+        </div>
+      </section>
+
+      <section
+        id="settings-tags-categories"
+        class="settings-page__panel"
+        aria-labelledby="settings-tags-categories-title"
+      >
+        <header class="settings-page__panel-header">
+          <div>
+            <h2 id="settings-tags-categories-title">Tags &amp; categories</h2>
+            <p>Control how labels and collections behave.</p>
+          </div>
+        </header>
+
+        <div class="settings-page__setting-list" [formGroup]="settingsForm">
+          <div class="settings-page__setting-row">
+            <div class="settings-page__setting-label">
+              <i class="fa-solid fa-tag" aria-hidden="true"></i>
+              <span>Default tag sort</span>
+            </div>
+            <select class="fav-select settings-page__select" formControlName="tagsDefaultSort">
+              @for (option of tagSortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="settings-page__setting-row">
+            <div class="settings-page__setting-label">
+              <i class="fa-solid fa-folder" aria-hidden="true"></i>
+              <span>Default category sort</span>
+            </div>
+            <select class="fav-select settings-page__select" formControlName="categoriesDefaultSort">
+              @for (option of categorySortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings-import-export" class="settings-page__panel" aria-labelledby="settings-import-export-title">
+        <header class="settings-page__panel-header">
+          <div>
+            <h2 id="settings-import-export-title">Import / Export</h2>
+            <p>Move your data in or out of Favourites.</p>
+          </div>
+        </header>
+
+        <div class="settings-page__action-grid">
+          <div class="settings-page__action-tile">
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--block"
+                    (click)="openSettingsImportModal('html')">
+              <i class="fa-solid fa-file-import" aria-hidden="true"></i>
+              <span>Import bookmarks (HTML file)</span>
+            </button>
+            <p>Bring in a browser bookmark export.</p>
+          </div>
+          <div class="settings-page__action-tile">
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--block"
+                    [disabled]="exportingHtml() || usedLinks() === 0"
+                    [title]="usedLinks() === 0 ? 'Save at least one link first' : ''"
+                    (click)="exportHtml()">
+              <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+              <span>{{ exportingHtml() ? 'Exporting…' : 'Export bookmarks (HTML file)' }}</span>
+            </button>
+            <p>Download bookmarks you can import into any browser.</p>
+          </div>
+          <div class="settings-page__action-tile">
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--block"
+                    (click)="openSettingsImportModal('json')">
+              <i class="fa-solid fa-file-import" aria-hidden="true"></i>
+              <span>Import bookmarks (JSON file)</span>
+            </button>
+            <p>Restore a Favourites JSON export, including tags and categories.</p>
+          </div>
+          <div class="settings-page__action-tile">
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--block"
+                    [disabled]="exportingJson() || usedLinks() === 0"
+                    [title]="usedLinks() === 0 ? 'Save at least one link first' : ''"
+                    (click)="exportJson()">
+              <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+              <span>{{ exportingJson() ? 'Exporting…' : 'Export all links (JSON)' }}</span>
+            </button>
+            <p>Download the full link library.</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="settings-danger-zone"
+        class="settings-page__panel settings-page__panel--danger"
+        aria-labelledby="settings-danger-title"
+      >
+        <header class="settings-page__panel-header">
+          <div>
+            <h2 id="settings-danger-title">Danger zone</h2>
+            <p>Permanent actions that require confirmation.</p>
+          </div>
+        </header>
+
+        @if (dangerMessage(); as message) {
+          <p class="settings-page__inline-status settings-page__inline-status--success" role="status">
+            {{ message }}
+          </p>
+        }
+        @if (dangerError(); as message) {
+          <p class="settings-page__inline-status settings-page__inline-status--error" role="alert">
+            {{ message }}
+          </p>
+        }
+
+        <div class="settings-page__danger-actions">
+          <div class="settings-page__danger-row">
+            <div>
+              <h3>Delete all archived links</h3>
+              <p>This will permanently delete all archived links.</p>
+            </div>
+            <button type="button" class="fav-btn fav-btn--danger" (click)="openDeleteArchivedModal()">
+              Delete
+            </button>
+          </div>
+          <div class="settings-page__danger-row">
+            <div>
+              <h3>Delete account</h3>
+              <p>This will permanently delete your account and all data.</p>
+            </div>
+            <button type="button" class="fav-btn fav-btn--danger" (click)="openDeleteAccountModal()">
+              Delete
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  @if (deleteArchivedModalOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeDeleteArchivedModal()"></div>
+    <div class="fav-modal fav-modal--sm" role="dialog" aria-modal="true" aria-labelledby="delete-archived-title">
+      <div class="fav-modal__dialog" favFocusTrap>
+        <header class="fav-modal__header">
+          <div>
+            <h2 id="delete-archived-title" class="fav-modal__title">Delete archived links?</h2>
+            <p class="fav-modal__subtitle">This action cannot be undone.</p>
+          </div>
+          <button type="button" class="fav-modal__close" aria-label="Close" (click)="closeDeleteArchivedModal()">
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </header>
+        <div class="fav-modal__body">
+          <p>
+            This will permanently delete
+            <strong>{{ summary()?.totalArchived ?? 0 }}</strong>
+            archived links.
+          </p>
+        </div>
+        <footer class="fav-modal__footer">
+          <button type="button" class="fav-btn fav-btn--secondary" (click)="closeDeleteArchivedModal()" [disabled]="deletingArchived()">
+            Cancel
+          </button>
+          <button type="button" class="fav-btn fav-btn--danger" (click)="confirmDeleteArchived()" [class.is-loading]="deletingArchived()" [disabled]="deletingArchived()">
+            @if (deletingArchived()) {
+              <span class="fav-spinner" aria-hidden="true"></span>
+            }
+            <span>Delete archived</span>
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (deleteAccountModalOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeDeleteAccountModal()"></div>
+    <div class="fav-modal fav-modal--sm" role="dialog" aria-modal="true" aria-labelledby="delete-account-title">
+      <div class="fav-modal__dialog" favFocusTrap>
+        <header class="fav-modal__header">
+          <div>
+            <h2 id="delete-account-title" class="fav-modal__title">Delete account?</h2>
+            <p class="fav-modal__subtitle">Your account and saved data will be removed.</p>
+          </div>
+          <button type="button" class="fav-modal__close" aria-label="Close" (click)="closeDeleteAccountModal()">
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </header>
+        <div class="fav-modal__body">
+          <p>
+            This permanently deletes your links, tags, categories, preferences, archived data, and account.
+          </p>
+        </div>
+        <footer class="fav-modal__footer">
+          <button type="button" class="fav-btn fav-btn--secondary" (click)="closeDeleteAccountModal()" [disabled]="deletingAccount()">
+            Cancel
+          </button>
+          <button type="button" class="fav-btn fav-btn--danger" (click)="confirmDeleteAccount()" [class.is-loading]="deletingAccount()" [disabled]="deletingAccount()">
+            @if (deletingAccount()) {
+              <span class="fav-spinner" aria-hidden="true"></span>
+            }
+            <span>Delete account</span>
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  <!-- ── Import bookmarks modal (Settings entry point) ─────────── -->
+  @if (settingsImportModalOpen()) {
+    <app-import-bookmarks-modal [format]="settingsImportFormat()" (closed)="onSettingsImportClosed($event)" />
+  }
+</section>

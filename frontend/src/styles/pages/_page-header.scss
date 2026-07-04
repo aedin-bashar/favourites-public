@@ -1,0 +1,96 @@
+// Reusable authenticated page header — title, subtitle, primary action row.
+// Source: docs/UI_DESIGN_GUIDE.md §6, §7, §19.
+//
+// Used by the Tags, Categories, and Settings pages today; also reusable for
+// All Links and Dashboard. Stacks vertically on mobile so the action falls
+// below the title block.
+
+@use '../tokens-breakpoints' as bp;
+
+.fav-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-3);
+  padding-bottom: var(--fav-space-5);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+  margin-bottom: var(--fav-space-5);
+
+  @include bp.up(md) {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--fav-space-5);
+  }
+}
+
+.fav-page-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-1);
+  min-width: 0;
+}
+
+.fav-page-header__title {
+  margin: 0;
+  font-size: var(--fav-text-app-h1-size);
+  font-weight: var(--fav-text-app-h1-weight);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-tight);
+}
+
+.fav-page-header__subtitle {
+  margin: 0;
+  font-size: var(--fav-font-size-md);
+  color: var(--fav-color-text-muted);
+  line-height: var(--fav-line-height-normal);
+}
+
+.fav-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fav-space-2);
+
+  @include bp.down(md) {
+    .fav-btn { flex: 1 1 auto; }
+  }
+}
+
+// Tabs / segmented control row (mobile Tags vs Categories — UI guide §19).
+
+.fav-page-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0.25rem;
+  background-color: var(--fav-color-surface-alt);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-md);
+}
+
+.fav-page-tabs__item {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: var(--fav-space-2) var(--fav-space-4);
+  border-radius: var(--fav-radius-sm);
+  font-size: var(--fav-font-size-sm);
+  font-weight: var(--fav-font-weight-medium);
+  color: var(--fav-color-text-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    color: var(--fav-color-text-heading);
+  }
+
+  &.is-active {
+    background-color: var(--fav-color-surface);
+    color: var(--fav-color-text-heading);
+    box-shadow: var(--fav-shadow-xs);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fav-border-focus-ring);
+  }
+}

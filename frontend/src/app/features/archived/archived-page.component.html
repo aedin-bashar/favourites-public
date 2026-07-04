@@ -1,0 +1,712 @@
+<section class="archived-page">
+
+  <!-- ── Page header ─────────────────────────────────────────── -->
+  <header class="fav-page-header archived-page__header">
+    <div class="fav-page-header__text">
+      <h1 class="fav-page-header__title">Archived</h1>
+      <p class="fav-page-header__subtitle">
+        Review saved links you've archived and restore them when needed.
+      </p>
+    </div>
+    <div class="fav-page-header__actions">
+      <button
+        type="button"
+        class="fav-btn fav-btn--outline"
+        [disabled]="!hasSelection()"
+        [attr.aria-disabled]="!hasSelection()"
+        aria-label="Restore selected archived links"
+        (click)="openRestoreManyModal()"
+      >
+        <i [class]="icons.Restore" class="fav-icon" aria-hidden="true"></i>
+        <span>Restore selected</span>
+      </button>
+      <button
+        type="button"
+        class="fav-btn fav-btn--danger"
+        aria-label="Empty archive — permanently delete all archived links"
+        (click)="openEmptyArchiveModal()"
+      >
+        <i [class]="icons.Delete" class="fav-icon" aria-hidden="true"></i>
+        <span>Empty archive</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main + right-rail layout ────────────────────────────── -->
+  <div class="archived-page__layout">
+
+    <!-- ── Main column ────────────────────────────────────────────── -->
+    <div class="archived-page__main">
+
+      <!-- ── Info banner ──────────────────────────────────── -->
+      @if (!bannerDismissed()) {
+        <div class="archived-page__banner" role="note" aria-live="polite">
+          <i [class]="icons.Info" class="archived-page__banner-icon" aria-hidden="true"></i>
+          <p class="archived-page__banner-text">
+            Archived links are hidden from your main lists, but you can restore them anytime.
+          </p>
+          <button
+            type="button"
+            class="archived-page__banner-dismiss"
+            aria-label="Dismiss this notice"
+            (click)="dismissBanner()"
+          >
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+
+      <!-- ── Stat cards row ────────────────────────────────── -->
+      <div class="archived-page__stat-cards">
+        <fav-stat-card
+          label="Archived links"
+          [value]="summaryLoading() ? '…' : (summary()?.archivedLinks ?? 0)"
+          icon="fa-box-archive"
+          tone="teal"
+        />
+        <fav-stat-card
+          label="Archived this month"
+          [value]="summaryLoading() ? '…' : (summary()?.archivedThisMonth ?? 0)"
+          icon="fa-calendar"
+          tone="indigo"
+        />
+        <fav-stat-card
+          label="Oldest archived"
+          [value]="summaryLoading() ? '…' : (summary()?.oldestArchived?.title ?? '—')"
+          icon="fa-clock"
+          tone="amber"
+        />
+        <fav-stat-card
+          label="Restored recently"
+          [value]="summaryLoading() ? '…' : (summary()?.restoredRecently ?? 0)"
+          icon="fa-arrow-rotate-left"
+          tone="rose"
+        />
+      </div>
+
+      <!-- ── Filter toolbar — desktop ──────────────────────── -->
+      <div class="archived-page__toolbar archived-page__toolbar--desktop"
+           role="region" aria-label="Search, filter, and sort archived links">
+
+        <!-- Search -->
+        <div class="archived-page__search">
+          <label for="archived-search" class="fav-sr-only">Search archived links</label>
+          <div class="archived-page__search-field">
+            <i [class]="icons.Search" class="archived-page__search-icon" aria-hidden="true"></i>
+            <input
+              id="archived-search"
+              type="search"
+              class="fav-input archived-page__search-input"
+              placeholder="Search archived links…"
+              autocomplete="off"
+              [formControl]="searchControl"
+            />
+            @if (searchControl.value) {
+              <button
+                type="button"
+                class="archived-page__search-clear"
+                aria-label="Clear search"
+                (click)="clearSearch()"
+              >
+                <i [class]="icons.Close" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="archived-page__filters">
+
+          <div class="fav-field archived-page__filter">
+            <label class="fav-label" for="archived-category-filter">Category</label>
+            <select
+              id="archived-category-filter"
+              class="fav-input"
+              [value]="activeCategoryId() ?? ''"
+              (change)="onCategoryChange($event)"
+            >
+              <option value="">All categories</option>
+              @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field archived-page__filter">
+            <label class="fav-label" for="archived-tag-filter">Tag</label>
+            <select
+              id="archived-tag-filter"
+              class="fav-input"
+              [value]="activeTagId() ?? ''"
+              (change)="onTagChange($event)"
+            >
+              <option value="">All tags</option>
+              @for (tag of tags(); track tag.id) {
+                <option [value]="tag.id">{{ tag.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field archived-page__filter">
+            <label class="fav-label" for="archived-date-filter">Archived date</label>
+            <select
+              id="archived-date-filter"
+              class="fav-input"
+              [value]="activeDateRange()"
+              (change)="onDateRangeChange($event)"
+            >
+              @for (opt of dateRangeOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field archived-page__filter">
+            <label class="fav-label" for="archived-sort">Sort by</label>
+            <select
+              id="archived-sort"
+              class="fav-input"
+              [value]="activeSort()"
+              (change)="onSortChange($event)"
+            >
+              @for (opt of sortOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Clear filters + view toggle -->
+        <div class="archived-page__toolbar-end">
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              class="archived-page__clear-filters"
+              (click)="clearAllFilters()"
+            >
+              Clear filters
+            </button>
+          }
+          <fav-view-toggle
+            pageId="archived"
+            (modeChange)="onViewModeChange($event)"
+          />
+        </div>
+      </div>
+
+      <!-- ── Filter button — mobile ────────────────────────── -->
+      <div class="archived-page__toolbar archived-page__toolbar--mobile">
+        <button
+          type="button"
+          class="fav-btn fav-btn--outline archived-page__filter-btn"
+          (click)="openFilterSheet()"
+        >
+          <i class="fa-solid fa-sliders fav-icon" aria-hidden="true"></i>
+          <span>Filters</span>
+          @if (hasActiveFilters()) {
+            <span class="archived-page__filter-badge" aria-label="Active filters"></span>
+          }
+        </button>
+        <fav-view-toggle
+          pageId="archived"
+          (modeChange)="onViewModeChange($event)"
+        />
+      </div>
+
+      <!-- ── Restore error alert ────────────────────────────────────── -->
+      @if (restoreError(); as msg) {
+        <div class="fav-alert fav-alert--danger" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">{{ msg }}</div>
+        </div>
+      }
+
+      <!-- Delete error alert (shown here when the confirm modal is skipped) -->
+      @if (!deleteTarget() && deleteError(); as msg) {
+        <div class="fav-alert fav-alert--danger" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">{{ msg }}</div>
+        </div>
+      }
+
+      <!-- ── Content area ─────────────────────────────── -->
+      @if (loading()) {
+        <div class="fav-loading archived-page__loading" role="status" aria-live="polite">
+          <span class="fav-spinner" aria-hidden="true"></span>
+          <span>
+            @if (hasActiveFilters()) { Searching archived links… }
+            @else { Loading archived links… }
+          </span>
+        </div>
+      } @else if (error(); as message) {
+        <div class="fav-alert fav-alert--danger" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">
+            <p class="archived-page__alert-message">{{ message }}</p>
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reload()">
+              Try again
+            </button>
+          </div>
+        </div>
+      } @else if (displayedLinks().length === 0) {
+        @if (hasActiveFilters()) {
+          <div class="fav-empty-state fav-empty-state--subtle archived-page__empty">
+            <div class="fav-empty-state__icon" aria-hidden="true"><i [class]="icons.Search"></i></div>
+            <h2 class="fav-empty-state__title">No archived links match the current filters</h2>
+            <p class="fav-empty-state__message">
+              <button type="button" class="archived-page__empty-link" (click)="clearAllFilters()">Clear all filters</button>
+              to see all archived links.
+            </p>
+          </div>
+        } @else {
+          <div class="fav-empty-state fav-empty-state--subtle archived-page__empty">
+            <div class="fav-empty-state__icon" aria-hidden="true"><i [class]="icons.Archived"></i></div>
+            <h2 class="fav-empty-state__title">No archived links</h2>
+            <p class="fav-empty-state__message">Links you archive will appear here. You can restore them any time.</p>
+          </div>
+        }
+      } @else {
+
+        <!-- Select all bar -->
+        <div class="archived-page__select-bar" aria-live="polite">
+          <label class="archived-page__select-all">
+            <input
+              type="checkbox"
+              class="archived-page__checkbox"
+              [checked]="allSelected()"
+              [indeterminate]="hasSelection() && !allSelected()"
+              (change)="toggleSelectAll()"
+              aria-label="Select all visible archived links"
+            />
+            <span>{{ allSelected() ? 'Deselect all' : 'Select all' }}</span>
+          </label>
+          @if (hasSelection()) {
+            <span class="archived-page__select-count">{{ selectedIds().size }} selected</span>
+          }
+        </div>
+
+        <!-- List view -->
+        @if (viewMode() === 'list') {
+          <ul class="archived-page__items archived-page__items--list" aria-label="Archived links">
+            @for (link of displayedLinks(); track trackById($index, link)) {
+              <li class="archived-page__row" [class.is-selected]="selectedIds().has(link.id)">
+                <label class="archived-page__row-check" [attr.aria-label]="'Select ' + link.title">
+                  <input type="checkbox" class="archived-page__checkbox"
+                    [checked]="selectedIds().has(link.id)" (change)="toggleSelect(link.id)" />
+                </label>
+                <div class="archived-page__row-favicon" aria-hidden="true">
+                  @if (preferences().showFavicon) {
+                    <img [src]="link.url | faviconUrl"
+                      alt="" width="20" height="20" loading="lazy"
+                      (error)="$any($event.target).style.display='none'" />
+                  } @else {
+                    <i [class]="icons.Link" class="fav-icon" aria-hidden="true"></i>
+                  }
+                </div>
+                <div class="archived-page__row-content">
+                  <div class="archived-page__row-heading">
+                    <a class="archived-page__row-title" [href]="link.url"
+                      [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                      [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null">{{ link.title }}</a>
+                    <span class="archived-page__row-domain">{{ link.url | domainExtract }}</span>
+                  </div>
+                  @if (link.description) {
+                    <p class="archived-page__row-description">{{ link.description }}</p>
+                  }
+                  <div class="archived-page__row-meta">
+                    @if (link.tags.length > 0 || link.category) {
+                      <div class="fav-badge-list archived-page__row-badges">
+                        @if (link.category; as cat) {
+                          <span class="fav-badge fav-badge--category">
+                            <i [class]="icons.Category" [style.color]="cat.color" aria-hidden="true"></i> {{ cat.name }}
+                          </span>
+                        }
+                        @for (tag of link.tags; track tag.id) {
+                          <span class="fav-badge fav-badge--tag">{{ tag.name }}</span>
+                        }
+                      </div>
+                    }
+                    <fav-status-pill status="archived" />
+                    <time class="archived-page__row-date" [attr.datetime]="link.updatedAtUtc ?? link.createdAtUtc">
+                      Archived {{ (link.updatedAtUtc ?? link.createdAtUtc) | date: 'mediumDate' }}
+                    </time>
+                  </div>
+                </div>
+                <div class="archived-page__row-actions fav-btn-group" role="group" [attr.aria-label]="'Actions for ' + link.title">
+                  <a class="fav-btn fav-btn--ghost fav-btn--icon" [href]="link.url"
+                    [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                    [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+                    [attr.aria-label]="'Open ' + link.title">
+                    <i [class]="icons.OpenLink" aria-hidden="true"></i>
+                  </a>
+                  <button type="button" class="fav-btn fav-btn--ghost fav-btn--icon"
+                    [attr.aria-label]="'Edit ' + link.title" (click)="onEditRequested(link)">
+                    <i [class]="icons.Edit" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="fav-btn fav-btn--ghost fav-btn--icon"
+                    [attr.aria-label]="'Restore ' + link.title"
+                    [disabled]="restoreBusyId() === link.id" (click)="onRestoreRequested(link)">
+                    <i [class]="icons.Restore" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="fav-btn fav-btn--ghost fav-btn--icon archived-page__row-delete"
+                    [attr.aria-label]="'Delete ' + link.title" (click)="onDeleteRequested(link)">
+                    <i [class]="icons.Delete" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- Cards view -->
+        @if (viewMode() === 'cards') {
+          <ul class="archived-page__items archived-page__items--cards" aria-label="Archived links">
+            @for (link of displayedLinks(); track trackById($index, link)) {
+              <li class="archived-page__item">
+                <app-link-card
+                  [link]="link"
+                  [archiveBusy]="restoreBusyId() === link.id"
+                  (restoreRequested)="onRestoreRequested($event)"
+                  (editRequested)="onEditRequested($event)"
+                  (deleteRequested)="onDeleteRequested($event)"
+                />
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- Pagination -->
+        <fav-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [total]="total()"
+          (pageChange)="onPageChange($event)"
+        />
+
+      }
+
+    </div><!-- /archived-page__main -->
+
+    <!-- ── Right rail ──────────────────────────────────────── -->
+    <fav-right-rail class="archived-page__rail">
+
+        <!-- Archive summary -->
+        <fav-rail-widget title="Archive summary">
+          <ul class="archived-page__rail-list" aria-label="Archive summary">
+            <li class="archived-page__rail-item">
+              <span class="archived-page__rail-label">Archived links</span>
+              <span class="archived-page__rail-value fav-text-primary">
+                {{ summaryLoading() ? '…' : (summary()?.archivedLinks ?? 0) }}
+              </span>
+            </li>
+            <li class="archived-page__rail-item">
+              <span class="archived-page__rail-label">Archived this month</span>
+              <span class="archived-page__rail-value fav-text-primary">
+                {{ summaryLoading() ? '…' : (summary()?.archivedThisMonth ?? 0) }}
+              </span>
+            </li>
+            <li class="archived-page__rail-item">
+              <span class="archived-page__rail-label">Restored recently</span>
+              <span class="archived-page__rail-value fav-text-primary">
+                {{ summaryLoading() ? '…' : (summary()?.restoredRecently ?? 0) }}
+              </span>
+            </li>
+          </ul>
+          <a routerLink="/app/archived" class="fav-rail-link" aria-label="View all archived links">
+            View all archived links
+            <i class="fa-solid fa-arrow-right fav-icon--sm" aria-hidden="true"></i>
+          </a>
+        </fav-rail-widget>
+
+        <!-- Cleanup suggestions — uses dedicated endpoint -->
+        <fav-rail-widget title="Cleanup suggestions">
+          @if (cleanupLoading()) {
+            <p class="fav-text-muted fav-font-size-sm">Loading…</p>
+          } @else if (cleanupSuggestions().length === 0) {
+            <p class="fav-text-muted fav-font-size-sm">No cleanup suggestions right now.</p>
+          } @else {
+            <p class="fav-text-muted fav-font-size-sm">
+              Archived &gt; 90 days — consider deleting these.
+            </p>
+            <ul class="archived-page__rail-list" aria-label="Cleanup suggestions">
+              @for (link of cleanupSuggestions(); track link.id) {
+                <li class="archived-page__rail-item archived-page__rail-item--suggestion">
+                  <span class="archived-page__rail-label" [title]="link.title">{{ link.title }}</span>
+                  <button
+                    type="button"
+                    class="archived-page__suggestion-delete fav-icon-btn"
+                    [disabled]="deletingSuggestionId() === link.id"
+                    [attr.aria-label]="'Delete ' + link.title"
+                    (click)="deleteSuggestion(link)"
+                  >
+                    @if (deletingSuggestionId() === link.id) {
+                      <span class="fav-spinner fav-spinner--xs" aria-hidden="true"></span>
+                    } @else {
+                      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </fav-rail-widget>
+
+        <!-- Quick actions -->
+        <fav-rail-widget title="Quick actions">
+          <ul class="archived-page__rail-actions" aria-label="Quick actions">
+            <li>
+              <button
+                type="button"
+                class="archived-page__rail-action"
+                [disabled]="!hasSelection()"
+                (click)="openRestoreManyModal()"
+              >
+                <i [class]="icons.Restore" class="fav-icon--sm" aria-hidden="true"></i>
+                Restore selected
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                class="archived-page__rail-action"
+                (click)="openEmptyArchiveModal()"
+              >
+                <i [class]="icons.Delete" class="fav-icon--sm" aria-hidden="true"></i>
+                Empty archive
+              </button>
+            </li>
+          </ul>
+        </fav-rail-widget>
+
+      </fav-right-rail>
+
+  </div><!-- /archived-page__layout -->
+
+  <!-- ── Mobile filter sheet ──────────────────────────────────── -->
+  @if (filterSheetOpen()) {
+    <div
+      class="archived-page__sheet-backdrop"
+      role="presentation"
+      (click)="closeFilterSheet()"
+    ></div>
+    <div
+      class="archived-page__sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Filter archived links"
+      favFocusTrap
+    >
+      <div class="archived-page__sheet-header">
+        <h2 class="archived-page__sheet-title">Filters</h2>
+        <button type="button" class="archived-page__sheet-close" aria-label="Close filters" (click)="closeFilterSheet()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="archived-page__sheet-body">
+
+        <div class="fav-field">
+          <label class="fav-label" for="mobile-archived-search">Search</label>
+          <input
+            id="mobile-archived-search"
+            type="search"
+            class="fav-input"
+            placeholder="Search archived links…"
+            autocomplete="off"
+            [formControl]="searchControl"
+          />
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="mobile-archived-category">Category</label>
+          <select
+            id="mobile-archived-category"
+            class="fav-input"
+            [value]="activeCategoryId() ?? ''"
+            (change)="onCategoryChange($event)"
+          >
+            <option value="">All categories</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="mobile-archived-tag">Tag</label>
+          <select
+            id="mobile-archived-tag"
+            class="fav-input"
+            [value]="activeTagId() ?? ''"
+            (change)="onTagChange($event)"
+          >
+            <option value="">All tags</option>
+            @for (tag of tags(); track tag.id) {
+              <option [value]="tag.id">{{ tag.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="mobile-archived-date">Archived date</label>
+          <select
+            id="mobile-archived-date"
+            class="fav-input"
+            [value]="activeDateRange()"
+            (change)="onDateRangeChange($event)"
+          >
+            @for (opt of dateRangeOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fav-field">
+          <label class="fav-label" for="mobile-archived-sort">Sort by</label>
+          <select
+            id="mobile-archived-sort"
+            class="fav-input"
+            [value]="activeSort()"
+            (change)="onSortChange($event)"
+          >
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+
+      </div>
+
+      <div class="archived-page__sheet-footer">
+        @if (hasActiveFilters()) {
+          <button type="button" class="fav-btn fav-btn--ghost" (click)="clearAllFilters()">
+            Clear all filters
+          </button>
+        }
+        <button type="button" class="fav-btn fav-btn--primary" (click)="applyFiltersFromSheet()">
+          Apply filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Empty archive confirm dialog ──────────────────────────── -->
+  @if (emptyArchiveModalOpen()) {
+    <div
+      class="fav-modal-backdrop"
+      role="presentation"
+      (click)="closeEmptyArchiveModal()"
+    ></div>
+    <div
+      class="fav-modal archived-page__confirm-modal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="empty-archive-title"
+      aria-describedby="empty-archive-desc"
+      favFocusTrap
+    >
+      <div class="fav-modal__header">
+        <h2 class="fav-modal__title" id="empty-archive-title">Empty archive?</h2>
+        <button type="button" class="fav-modal__close" aria-label="Cancel" (click)="closeEmptyArchiveModal()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="fav-modal__body">
+        <p id="empty-archive-desc">
+          This will permanently delete all
+          <strong>{{ summary()?.archivedLinks ?? 0 }}</strong>
+          archived links. This action cannot be undone.
+        </p>
+        @if (emptyArchiveError(); as msg) {
+          <div class="fav-alert fav-alert--danger" role="alert">
+            <div class="fav-alert__body">{{ msg }}</div>
+          </div>
+        }
+      </div>
+      <div class="fav-modal__footer">
+        <button type="button" class="fav-btn fav-btn--outline" [disabled]="emptyingArchive()" (click)="closeEmptyArchiveModal()">
+          Cancel
+        </button>
+        <button type="button" class="fav-btn fav-btn--danger" [disabled]="emptyingArchive()" (click)="confirmEmptyArchive()">
+          <i [class]="icons.Delete" class="fav-icon" aria-hidden="true"></i>
+          {{ emptyingArchive() ? 'Deleting…' : 'Delete all archived' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Restore selected confirm dialog ───────────────────────── -->
+  @if (restoreManyModalOpen()) {
+    <div class="fav-modal-backdrop" role="presentation" (click)="closeRestoreManyModal()"></div>
+    <div
+      class="fav-modal archived-page__confirm-modal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="restore-many-title"
+      aria-describedby="restore-many-desc"
+      favFocusTrap
+    >
+      <div class="fav-modal__header">
+        <h2 class="fav-modal__title" id="restore-many-title">Restore selected links?</h2>
+        <button type="button" class="fav-modal__close" aria-label="Cancel" (click)="closeRestoreManyModal()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="fav-modal__body">
+        <p id="restore-many-desc">
+          This will restore <strong>{{ selectedIds().size }}</strong>
+          {{ selectedIds().size === 1 ? 'link' : 'links' }} back to your active list.
+        </p>
+        @if (bulkRestoreError(); as msg) {
+          <div class="fav-alert fav-alert--danger" role="alert">
+            <div class="fav-alert__body">{{ msg }}</div>
+          </div>
+        }
+      </div>
+      <div class="fav-modal__footer">
+        <button type="button" class="fav-btn fav-btn--outline" [disabled]="bulkRestoring()" (click)="closeRestoreManyModal()">Cancel</button>
+        <button type="button" class="fav-btn fav-btn--primary" [disabled]="bulkRestoring()" (click)="confirmRestoreMany()">
+          <i [class]="icons.Restore" class="fav-icon" aria-hidden="true"></i>
+          {{ bulkRestoring() ? 'Restoring…' : 'Restore links' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Delete single link confirm dialog ─────────────────────────────── -->
+  @if (deleteTarget(); as target) {
+    <div class="fav-modal-backdrop" role="presentation" (click)="closeDeleteConfirm()"></div>
+    <div
+      class="fav-modal archived-page__confirm-modal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-link-title"
+      aria-describedby="delete-link-desc"
+    >
+      <div class="fav-modal__header">
+        <h2 class="fav-modal__title" id="delete-link-title">Delete link?</h2>
+        <button type="button" class="fav-modal__close" aria-label="Cancel" (click)="closeDeleteConfirm()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="fav-modal__body">
+        <p id="delete-link-desc">
+          Permanently delete <strong>{{ target.title }}</strong>? This action cannot be undone.
+        </p>
+        @if (deleteError(); as msg) {
+          <div class="fav-alert fav-alert--danger" role="alert">
+            <div class="fav-alert__body">{{ msg }}</div>
+          </div>
+        }
+      </div>
+      <div class="fav-modal__footer">
+        <button type="button" class="fav-btn fav-btn--outline" [disabled]="deleting()" (click)="closeDeleteConfirm()">Cancel</button>
+        <button type="button" class="fav-btn fav-btn--danger" [disabled]="deleting()" (click)="confirmDelete()">
+          <i [class]="icons.Delete" class="fav-icon" aria-hidden="true"></i>
+          {{ deleting() ? 'Deleting…' : 'Delete link' }}
+        </button>
+      </div>
+    </div>
+  }
+
+</section>

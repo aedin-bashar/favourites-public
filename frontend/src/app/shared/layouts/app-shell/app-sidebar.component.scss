@@ -1,0 +1,174 @@
+// Desktop left sidebar — UI_DESIGN_GUIDE.md §7, §9.
+
+:host {
+  display: block;
+  width: var(--fav-sidebar-width);
+  height: 100%;
+  background-color: var(--fav-color-bg-page);
+  border-right: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--fav-space-4) var(--fav-space-3);
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+    padding: var(--fav-space-2) var(--fav-space-3);
+    color: var(--fav-color-text-heading);
+    font-weight: var(--fav-font-weight-bold);
+    font-size: var(--fav-font-size-lg);
+    text-decoration: none;
+    margin-bottom: var(--fav-space-4);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-text-heading);
+      text-decoration: none;
+    }
+  }
+
+  &__brand-mark {
+    color: var(--fav-color-primary);
+    font-size: 1.25rem;
+  }
+
+  &__nav {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--fav-space-1);
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: var(--fav-space-3);
+    padding: var(--fav-space-2) var(--fav-space-3);
+    min-height: 2.5rem;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--fav-color-text-body);
+    font-weight: var(--fav-font-weight-medium);
+    font-size: var(--fav-font-size-md);
+    text-decoration: none;
+    border-radius: var(--fav-radius-md);
+    cursor: pointer;
+    text-align: start;
+    transition: background-color 120ms ease, color 120ms ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--fav-color-surface);
+      color: var(--fav-color-text-heading);
+      text-decoration: none;
+    }
+
+    &--active {
+      background-color: var(--fav-color-primary-soft);
+      color: var(--fav-color-primary);
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset-block: 0.375rem;
+        inset-inline-start: calc(var(--fav-space-3) * -1);
+        width: 3px;
+        border-radius: var(--fav-radius-pill);
+        background-color: var(--fav-color-primary);
+      }
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--fav-color-primary-soft);
+        color: var(--fav-color-primary);
+      }
+    }
+  }
+
+  &__icon {
+    width: 1.25rem;
+    text-align: center;
+    color: inherit;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    flex: 1 1 auto;
+  }
+
+  // User identity card at the bottom
+  &__user-card {
+    display: flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+    margin-top: var(--fav-space-4);
+    padding: var(--fav-space-3);
+    border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+    border-radius: var(--fav-radius-md);
+    min-width: 0;
+  }
+
+  &__user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--fav-radius-pill);
+    background-color: var(--fav-color-primary);
+    color: var(--fav-color-on-primary);
+    font-size: 0.7rem;
+    font-weight: var(--fav-font-weight-bold);
+    flex-shrink: 0;
+  }
+
+  &__user-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__user-name {
+    font-size: var(--fav-font-size-sm);
+    font-weight: var(--fav-font-weight-semibold);
+    color: var(--fav-color-text-heading);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__user-email {
+    font-size: var(--fav-font-size-xs);
+    color: var(--fav-color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__user-settings {
+    flex-shrink: 0;
+    color: var(--fav-color-text-muted);
+    transition: color 120ms ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-text-heading);
+    }
+  }
+}

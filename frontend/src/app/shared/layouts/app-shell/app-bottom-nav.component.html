@@ -1,0 +1,32 @@
+<nav class="app-bottom-nav" aria-label="Primary">
+  <ul class="app-bottom-nav__list">
+    @for (slot of slots; track slot.id) {
+      <li
+        class="app-bottom-nav__item"
+        [class.app-bottom-nav__item--action]="slot.isAction"
+      >
+        @if (slot.route && !slot.isAction) {
+          <a
+            class="app-bottom-nav__link"
+            routerLinkActive="app-bottom-nav__link--active"
+            [routerLink]="slot.route"
+          >
+            <i [class]="slot.icon" class="app-bottom-nav__icon" aria-hidden="true"></i>
+            <span class="app-bottom-nav__label">{{ slot.label }}</span>
+          </a>
+        } @else {
+          <button
+            type="button"
+            class="app-bottom-nav__link"
+            [class.app-bottom-nav__link--action]="slot.isAction"
+            [attr.aria-label]="slot.label"
+            (click)="onAction(slot)"
+          >
+            <i [class]="slot.icon" class="app-bottom-nav__icon" aria-hidden="true"></i>
+            <span class="app-bottom-nav__label">{{ slot.label }}</span>
+          </button>
+        }
+      </li>
+    }
+  </ul>
+</nav>

@@ -1,0 +1,13 @@
+// Barrel — forwards all design token partials so consumers can include
+// `@use "styles/tokens" as *;` instead of importing each partial individually.
+//
+// The color/spacing/radii/typography partials emit CSS custom properties
+// under :root; the breakpoints partial emits no CSS and only exposes
+// SCSS variables/mixins. All are idempotent — safe to include multiple
+// times.
+
+@forward "tokens-colors";
+@forward "tokens-spacing";
+@forward "tokens-radii-shadows";
+@forward "tokens-typography";
+@forward "tokens-breakpoints";

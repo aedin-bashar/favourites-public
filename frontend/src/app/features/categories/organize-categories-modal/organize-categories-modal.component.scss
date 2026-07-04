@@ -1,0 +1,104 @@
+.org-cat-modal__dialog {
+  max-width: 35rem;
+}
+
+.org-cat-modal__loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  color: var(--fav-color-text-secondary);
+}
+
+.org-cat-modal__hint {
+  color: var(--fav-color-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.org-cat-modal__group {
+  border: 1px solid var(--fav-color-border);
+  border-radius: var(--fav-radius-md);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.org-cat-modal__group-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fav-color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.org-cat-modal__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.org-cat-modal__cat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid var(--fav-color-border);
+  border-radius: var(--fav-radius-md);
+  background: var(--fav-color-surface);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--fav-color-primary);
+  }
+
+  &--selected {
+    border-color: var(--fav-color-primary);
+    background: color-mix(in srgb, var(--fav-color-primary) 10%, transparent);
+    color: var(--fav-color-primary);
+    font-weight: 500;
+  }
+}
+
+.org-cat-modal__cat-name {
+  font-weight: 500;
+}
+
+.org-cat-modal__cat-count {
+  font-size: 0.78rem;
+  color: var(--fav-color-text-muted);
+}
+
+.org-cat-modal__cat-check {
+  font-size: 0.75rem;
+  color: var(--fav-color-primary);
+}
+
+.org-cat-modal__empty,
+.org-cat-modal__done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--fav-color-text-secondary);
+
+  h3 {
+    margin: 0;
+    font-size: var(--fav-font-size-lg);
+    color: var(--fav-color-text-heading);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.org-cat-modal__empty-icon,
+.org-cat-modal__done-icon {
+  font-size: 2rem;
+  color: var(--fav-color-success, #22c55e);
+}

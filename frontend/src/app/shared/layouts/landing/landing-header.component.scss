@@ -1,0 +1,97 @@
+// Landing page header — per UI_DESIGN_GUIDE.md §9, §19.
+
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--fav-color-surface);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+.landing-header {
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--fav-space-5);
+    max-width: var(--fav-page-max-width);
+    margin: 0 auto;
+    padding: var(--fav-space-3) var(--fav-page-padding-x);
+    min-height: var(--fav-topbar-height);
+  }
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+    color: var(--fav-color-text-heading);
+    font-weight: var(--fav-font-weight-bold);
+    font-size: var(--fav-font-size-lg);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-text-heading);
+      text-decoration: none;
+    }
+  }
+
+  &__brand-mark {
+    color: var(--fav-color-primary);
+    font-size: 1.25rem;
+  }
+
+  &__brand-name {
+    line-height: 1;
+  }
+
+  &__actions {
+    margin-inline-start: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--fav-space-3);
+  }
+
+  &__signin {
+    color: var(--fav-color-text-heading);
+    font-weight: var(--fav-font-weight-medium);
+    padding: var(--fav-space-2) var(--fav-space-3);
+    border-radius: var(--fav-radius-sm);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-text-heading);
+      background-color: var(--fav-color-surface-alt);
+      text-decoration: none;
+    }
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    height: var(--fav-control-height);
+    padding: 0 var(--fav-space-4);
+    background-color: var(--fav-color-primary);
+    color: var(--fav-color-on-primary);
+    border-radius: var(--fav-radius-md);
+    font-weight: var(--fav-font-weight-semibold);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--fav-color-primary-dark);
+      color: var(--fav-color-on-primary);
+      text-decoration: none;
+    }
+  }
+
+}
+
+@media (max-width: 767.98px) {
+  .landing-header {
+    &__inner {
+      padding-inline: var(--fav-page-padding-x-sm);
+    }
+  }
+}

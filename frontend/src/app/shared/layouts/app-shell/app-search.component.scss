@@ -1,0 +1,107 @@
+// Global top-bar search input.
+
+.app-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  &__label {
+    // visually hidden — Bootstrap .visually-hidden utility may not apply inside
+    // host shadow; keep it explicit.
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  &__icon {
+    position: absolute;
+    left: var(--fav-space-4);
+    color: var(--fav-color-text-muted);
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
+
+  &__input {
+    width: 100%;
+    height: var(--fav-control-height);
+    padding: 0 var(--fav-space-4) 0 var(--fav-space-8);
+    background-color: var(--fav-color-bg-page);
+    border: 1px solid var(--fav-color-border);
+    border-right: none;
+    border-radius: 9999px 0 0 9999px;
+    color: var(--fav-color-text-body);
+    font-size: var(--fav-font-size-sm);
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &::placeholder {
+      color: var(--fav-color-text-muted);
+    }
+
+    &:focus {
+      border-color: var(--fav-color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--fav-color-primary) 18%, transparent);
+    }
+
+    // Hide browser's native search cancel button — we control UX ourselves.
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  &__clear {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: var(--fav-color-text-muted);
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+
+    &:hover {
+      color: var(--fav-color-text-body);
+      background-color: var(--fav-color-surface);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fav-color-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  &__btn {
+    flex-shrink: 0;
+    height: var(--fav-control-height);
+    padding: 0 var(--fav-space-5);
+    background-color: var(--fav-color-primary);
+    border: 1px solid var(--fav-color-primary);
+    border-radius: 0 9999px 9999px 0;
+    color: #fff;
+    font-size: var(--fav-font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: var(--fav-color-primary-hover, var(--fav-color-primary));
+      filter: brightness(0.92);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fav-color-primary);
+      outline-offset: 2px;
+    }
+  }
+}

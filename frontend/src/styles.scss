@@ -1,0 +1,93 @@
+// Favourites — global styles entry point.
+//
+// SCSS load order (matters):
+//   1. `styles/bootstrap-overrides` — SCSS variable values (no CSS emitted).
+//   2. `bootstrap/scss/bootstrap`   — Bootstrap compiled with our overrides.
+//   3. `styles/tokens`              — :root CSS custom properties (--fav-*)
+//                                     plus breakpoint SCSS vars/mixins.
+//   4. `styles/base`                — body, headings, links, surfaces, a11y.
+//   5. `styles/icons`               — Font Awesome icon utility classes.
+//   6. `styles/components/...`      — reusable buttons, cards, forms, etc.
+//   7. `styles/responsive`          — visibility utilities, container helper,
+//                                     touch-target enforcement, reduced-motion.
+//
+// Font Awesome Free CSS is loaded globally via angular.json's `styles[]`
+// (see `node_modules/@fortawesome/fontawesome-free/css/all.min.css`) so that
+// it sits outside Sass and its url(../webfonts/…) references resolve at
+// build time.
+
+@use 'styles/bootstrap-overrides' as bs;
+
+@use 'bootstrap/scss/bootstrap' with (
+  // Theme colors
+  $primary:        bs.$primary,
+  $secondary:      bs.$secondary,
+  $success:        bs.$success,
+  $info:           bs.$info,
+  $warning:        bs.$warning,
+  $danger:         bs.$danger,
+  $light:          bs.$light,
+  $dark:           bs.$dark,
+
+  // Body, surfaces, text
+  $body-bg:                bs.$body-bg,
+  $body-color:             bs.$body-color,
+  $headings-color:         bs.$headings-color,
+  $text-muted:             bs.$text-muted,
+  $body-secondary-color:   bs.$body-secondary-color,
+
+  // Borders
+  $border-color:               bs.$border-color,
+  $border-color-translucent:   bs.$border-color-translucent,
+
+  // Typography
+  $font-family-sans-serif:  bs.$font-family-sans-serif,
+  $font-size-base:          bs.$font-size-base,
+  $line-height-base:        bs.$line-height-base,
+  $headings-font-weight:    bs.$headings-font-weight,
+
+  // Radii
+  $border-radius-sm:    bs.$border-radius-sm,
+  $border-radius:       bs.$border-radius,
+  $border-radius-lg:    bs.$border-radius-lg,
+  $border-radius-xl:    bs.$border-radius-xl,
+  $border-radius-pill:  bs.$border-radius-pill,
+
+  // Card
+  $card-border-color:  bs.$card-border-color,
+  $card-border-radius: bs.$card-border-radius,
+  $card-cap-bg:        bs.$card-cap-bg,
+  $card-spacer-y:      bs.$card-spacer-y,
+  $card-spacer-x:      bs.$card-spacer-x,
+
+  // Buttons
+  $btn-border-radius:    bs.$btn-border-radius,
+  $btn-border-radius-sm: bs.$btn-border-radius-sm,
+  $btn-border-radius-lg: bs.$btn-border-radius-lg,
+  $btn-padding-y:        bs.$btn-padding-y,
+  $btn-padding-x:        bs.$btn-padding-x,
+  $btn-font-weight:      bs.$btn-font-weight,
+
+  // Forms
+  $input-border-color:        bs.$input-border-color,
+  $input-border-radius:       bs.$input-border-radius,
+  $input-focus-border-color:  bs.$input-focus-border-color,
+  $input-focus-box-shadow:    bs.$input-focus-box-shadow,
+  $form-label-font-weight:    bs.$form-label-font-weight,
+  $form-label-color:          bs.$form-label-color,
+
+  // Modal
+  $modal-content-border-color:  bs.$modal-content-border-color,
+  $modal-content-border-radius: bs.$modal-content-border-radius,
+  $modal-backdrop-bg:           bs.$modal-backdrop-bg,
+  $modal-backdrop-opacity:      bs.$modal-backdrop-opacity
+);
+
+@use 'styles/tokens';
+@use 'styles/theme-dark';
+@use 'styles/density';
+@use 'styles/base';
+@use 'styles/icons';
+@use 'styles/components/components';
+@use 'styles/pages/pages';
+@use 'styles/responsive';

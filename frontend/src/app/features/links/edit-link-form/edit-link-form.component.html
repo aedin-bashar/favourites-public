@@ -1,0 +1,128 @@
+<form class="fav-form edit-link-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  @if (serverError(); as message) {
+    <div class="fav-alert fav-alert--danger" role="alert">
+      <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+      <div class="fav-alert__body">{{ message }}</div>
+    </div>
+  }
+
+  <div class="fav-field">
+    <label class="fav-label" for="edit-link-url">
+      URL
+      <span class="fav-label__required" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="edit-link-url"
+      class="fav-input"
+      type="url"
+      inputmode="url"
+      autocomplete="url"
+      placeholder="https://example.com/article"
+      required
+      formControlName="url"
+      [class.is-invalid]="form.controls.url.invalid && form.controls.url.touched"
+      [attr.aria-invalid]="form.controls.url.invalid && form.controls.url.touched ? 'true' : null"
+      aria-describedby="edit-link-url-error"
+    />
+    @if (
+      form.controls.url.touched &&
+      (form.controls.url.hasError('required') || form.controls.url.hasError('blank'))
+    ) {
+      <span id="edit-link-url-error" class="fav-field-error">Enter the link URL.</span>
+    } @else if (form.controls.url.touched && form.controls.url.hasError('maxlength')) {
+      <span id="edit-link-url-error" class="fav-field-error">
+        Use a URL that is 2048 characters or fewer.
+      </span>
+    } @else if (form.controls.url.touched && form.controls.url.hasError('url')) {
+      <span id="edit-link-url-error" class="fav-field-error">
+        Start the URL with http:// or https://.
+      </span>
+    }
+  </div>
+
+  <div class="fav-field">
+    <label class="fav-label" for="edit-link-title">
+      Title
+      <span class="fav-label__required" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="edit-link-title"
+      class="fav-input"
+      type="text"
+      autocomplete="off"
+      maxlength="200"
+      required
+      formControlName="title"
+      [class.is-invalid]="form.controls.title.invalid && form.controls.title.touched"
+      [attr.aria-invalid]="form.controls.title.invalid && form.controls.title.touched ? 'true' : null"
+      aria-describedby="edit-link-title-error"
+    />
+    @if (
+      form.controls.title.touched &&
+      (form.controls.title.hasError('required') || form.controls.title.hasError('blank'))
+    ) {
+      <span id="edit-link-title-error" class="fav-field-error">Add a title so this link is easy to find.</span>
+    } @else if (form.controls.title.touched && form.controls.title.hasError('maxlength')) {
+      <span id="edit-link-title-error" class="fav-field-error">
+        Keep the title to 200 characters or fewer.
+      </span>
+    }
+  </div>
+
+  <div class="fav-field">
+    <label class="fav-label" for="edit-link-description">
+      Description
+      <span class="fav-help">(optional)</span>
+    </label>
+    <textarea
+      id="edit-link-description"
+      class="fav-input fav-textarea"
+      rows="3"
+      maxlength="2000"
+      formControlName="description"
+      [class.is-invalid]="form.controls.description.invalid && form.controls.description.touched"
+      [attr.aria-invalid]="form.controls.description.invalid && form.controls.description.touched ? 'true' : null"
+      aria-describedby="edit-link-description-error"
+    ></textarea>
+    @if (form.controls.description.touched && form.controls.description.hasError('maxlength')) {
+      <span id="edit-link-description-error" class="fav-field-error">
+        Keep the description to 2000 characters or fewer.
+      </span>
+    }
+  </div>
+
+  <app-link-tag-picker
+    [selectedTagIds]="selectedTagIds()"
+    [disabled]="submitting()"
+    (selectionChanged)="onTagSelectionChanged($event)"
+  />
+
+  <app-link-category-picker
+    [selectedCategoryId]="selectedCategoryId()"
+    [disabled]="submitting()"
+    (selectionChanged)="onCategorySelectionChanged($event)"
+  />
+
+  <div class="edit-link-form__actions">
+    <button
+      type="button"
+      class="fav-btn fav-btn--outline"
+      [disabled]="submitting()"
+      (click)="onCancel()"
+    >
+      <span class="fav-btn__label">Cancel</span>
+    </button>
+    <button
+      type="submit"
+      class="fav-btn fav-btn--primary"
+      [class.is-loading]="submitting()"
+      [disabled]="submitting()"
+    >
+      @if (submitting()) {
+        <span class="fav-spinner" aria-hidden="true"></span>
+        <span class="fav-sr-only">Saving changes…</span>
+      }
+      <span class="fav-btn__label">Save changes</span>
+    </button>
+  </div>
+</form>

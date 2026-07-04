@@ -1,0 +1,38 @@
+<aside class="app-sidebar" aria-label="Primary navigation">
+  <!-- Logo -->
+  <a class="app-sidebar__brand" routerLink="/app/dashboard">
+    <i [class]="icons.Heart" class="app-sidebar__brand-mark" aria-hidden="true"></i>
+    <span class="app-sidebar__brand-name">{{ productName() }}</span>
+  </a>
+
+  <!-- Nav list -->
+  <nav class="app-sidebar__nav">
+    <ul class="app-sidebar__list">
+      @for (item of navItems; track item.id) {
+        <li class="app-sidebar__item">
+          <a
+            class="app-sidebar__link"
+            routerLinkActive="app-sidebar__link--active"
+            [routerLink]="item.route"
+          >
+            <i [class]="item.icon" class="app-sidebar__icon" aria-hidden="true"></i>
+            <span class="app-sidebar__label">{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- User identity card -->
+  <div class="app-sidebar__user-card">
+    <span class="app-sidebar__user-avatar" aria-hidden="true">{{ initials() }}</span>
+    <div class="app-sidebar__user-info">
+      @if (displayName(); as name) {
+        <span class="app-sidebar__user-name">{{ name }}</span>
+      }
+      @if (email(); as mail) {
+        <span class="app-sidebar__user-email">{{ mail }}</span>
+      }
+    </div>
+  </div>
+</aside>

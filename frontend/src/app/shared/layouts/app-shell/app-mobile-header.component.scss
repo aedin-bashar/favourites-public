@@ -1,0 +1,43 @@
+// Compact mobile header for authenticated pages.
+
+:host {
+  display: block;
+  background-color: var(--fav-color-surface);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+.app-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+  min-height: var(--fav-topbar-height);
+  padding: var(--fav-space-2) var(--fav-page-padding-x-sm);
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+    color: var(--fav-color-text-heading);
+    font-weight: var(--fav-font-weight-bold);
+    font-size: var(--fav-font-size-md);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-text-heading);
+      text-decoration: none;
+    }
+  }
+
+  &__brand-mark {
+    color: var(--fav-color-primary);
+    font-size: 1.125rem;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: var(--fav-space-1);
+  }
+}

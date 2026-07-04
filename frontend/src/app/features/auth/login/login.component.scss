@@ -1,0 +1,37 @@
+// Login page — UI_DESIGN_GUIDE.md §12, §19 (login page).
+// Most styling comes from `.fav-form` / `.fav-input` / `.fav-btn` global
+// components. This file holds only login-specific layout overrides.
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-gap-stack);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--fav-space-3);
+  }
+
+  &__forgot {
+    color: var(--fav-color-primary);
+    font-size: var(--fav-font-size-sm);
+    font-weight: var(--fav-font-weight-medium);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--fav-color-primary-dark);
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .login-form__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fav-space-2);
+  }
+}

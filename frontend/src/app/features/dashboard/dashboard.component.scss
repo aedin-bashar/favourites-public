@@ -1,0 +1,401 @@
+// Dashboard page — Phase R4.
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-5);
+}
+
+// ── Welcome header ──────────────────────────────────────────────────
+
+.dashboard__welcome {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fav-space-4);
+}
+
+.dashboard__welcome-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: var(--fav-font-weight-bold);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-tight);
+}
+
+.dashboard__welcome-subtitle {
+  margin: var(--fav-space-1) 0 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+// ── Main + rail grid ────────────────────────────────────────────────
+
+.dashboard__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--fav-space-5);
+  align-items: start;
+}
+
+// Show the right rail alongside the main column at ≥ 1280 px (matching the
+// app-shell grid breakpoint (that uses 3 columns at that width).
+// The shell already provides the outer 3-col grid; within the page content
+// area we add a secondary 2-col split: main (flex-1) + rail (fixed width).
+@media (min-width: 1280px) {
+  .dashboard__layout {
+    grid-template-columns: minmax(0, 1fr) var(--fav-rail-width);
+  }
+}
+
+.dashboard__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-5);
+  min-width: 0;
+}
+
+.dashboard__rail {
+  // Hidden on mobile/tablet — only visible in the desktop 2-col grid above.
+  display: none;
+
+  @media (min-width: 1280px) {
+    display: flex;
+  }
+}
+
+// ── Quick save ─────────────────────────────────────────────────────
+
+.dashboard__quick-save {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-3);
+}
+
+.dashboard__quick-save-header {
+  display: flex;
+  align-items: center;
+  gap: var(--fav-space-3);
+}
+
+.dashboard__quick-save-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background-color: var(--fav-color-tile-icon-teal-bg);
+  color: var(--fav-color-tile-icon-teal-fg);
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.dashboard__quick-save-title {
+  margin: 0;
+  font-size: var(--fav-font-size-md);
+  font-weight: var(--fav-font-weight-semibold);
+  color: var(--fav-color-text-heading);
+}
+
+.dashboard__quick-save-hint {
+  margin: 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+.dashboard__quick-save-row {
+  display: flex;
+  gap: var(--fav-space-2);
+  flex-wrap: wrap;
+}
+
+.dashboard__quick-save-input {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+.dashboard__quick-save-submit {
+  flex: 0 0 auto;
+}
+
+.dashboard__quick-save-success {
+  margin: 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-body);
+
+  a {
+    margin-inline-start: var(--fav-space-2);
+    color: var(--fav-color-primary);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dashboard__quick-save-row {
+    flex-direction: column;
+  }
+
+  // In a column flex container the 20rem flex-basis becomes height,
+  // stretching the input to ~320px tall.
+  .dashboard__quick-save-input {
+    flex-basis: auto;
+  }
+
+  .dashboard__quick-save-submit {
+    width: 100%;
+  }
+}
+
+// ── Stat cards row ─────────────────────────────────────────────────
+
+.dashboard__stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--fav-space-4);
+}
+
+// Stat card action link
+.dashboard__stat-action {
+  font-size: 0.6875rem;
+  color: var(--fav-color-primary);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: var(--fav-space-1);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+// Mobile: 2×2 grid
+@media (max-width: 767.98px) {
+  .dashboard__stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ── Recently added ─────────────────────────────────────────────────
+
+.dashboard__recent-panel {
+  min-width: 0;
+}
+
+.dashboard__panel-link {
+  font-size: var(--fav-font-size-sm);
+  font-weight: var(--fav-font-weight-medium);
+  color: var(--fav-color-primary);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.dashboard__recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard__recent-item {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto auto;
+  align-items: center;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-3) 0;
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.dashboard__recent-favicon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--fav-radius-sm);
+  background-color: var(--fav-color-surface-alt);
+  color: var(--fav-color-text-muted);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+
+  img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border-radius: 2px;
+  }
+}
+
+.dashboard__recent-body {
+  min-width: 0;
+}
+
+.dashboard__recent-title {
+  display: block;
+  font-size: var(--fav-font-size-sm);
+  font-weight: var(--fav-font-weight-semibold);
+  color: var(--fav-color-text-heading);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--fav-color-primary);
+    text-decoration: underline;
+  }
+}
+
+.dashboard__recent-domain {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--fav-color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard__recent-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fav-space-1);
+  justify-content: flex-end;
+}
+
+.dashboard__recent-date {
+  font-size: 0.6875rem;
+  color: var(--fav-color-text-muted);
+  white-space: nowrap;
+}
+
+// On mobile collapse tags + date to below the body row
+@media (max-width: 575.98px) {
+  .dashboard__recent-item {
+    grid-template-columns: 2rem 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .dashboard__recent-tags,
+  .dashboard__recent-date {
+    grid-column: 2;
+  }
+}
+
+// ── This week ──────────────────────────────────────────────────────
+
+.dashboard__this-week {
+  min-width: 0;
+}
+
+.dashboard__this-week-label {
+  font-size: 0.6875rem;
+  color: var(--fav-color-text-muted);
+}
+
+.dashboard__this-week-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--fav-space-4);
+  margin-top: var(--fav-space-3);
+}
+
+.dashboard__this-week-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-1);
+}
+
+.dashboard__this-week-value {
+  font-size: 1.5rem;
+  font-weight: var(--fav-font-weight-bold);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-tight);
+}
+
+.dashboard__this-week-name {
+  font-size: 0.6875rem;
+  color: var(--fav-color-text-muted);
+}
+
+// Mobile: 2×2 for this-week stats too
+@media (max-width: 767.98px) {
+  .dashboard__this-week-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ── Right rail widgets ────────────────────────────────────────────────────
+
+.dashboard__rail-empty {
+  margin: 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+.dashboard__tag-list,
+.dashboard__category-list,
+.dashboard__quick-access {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-2);
+}
+
+.dashboard__tag-item,
+.dashboard__category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fav-space-2);
+  min-width: 0;
+}
+
+.dashboard__category-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fav-space-1);
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-body);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard__quick-access-link {
+  display: flex;
+  align-items: center;
+  gap: var(--fav-space-2);
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-body);
+  text-decoration: none;
+  padding: var(--fav-space-1) 0;
+
+  i {
+    width: 1rem;
+    text-align: center;
+    color: var(--fav-color-text-muted);
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--fav-color-primary);
+
+    i { color: var(--fav-color-primary); }
+  }
+}

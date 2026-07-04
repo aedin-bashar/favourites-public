@@ -1,0 +1,50 @@
+<a class="app-shell__skip-link" href="#main-content">Skip to main content</a>
+
+<!-- Desktop sidebar — hidden on mobile via CSS -->
+<app-sidebar
+  class="app-shell__sidebar"
+  [productName]="productName()"
+  [displayName]="displayName()"
+  [email]="email()"
+/>
+
+<!-- Mobile header — hidden on desktop via CSS -->
+<app-mobile-header
+  class="app-shell__mobile-header"
+  [productName]="productName()"
+  [displayName]="displayName()"
+  [email]="email()"
+  (signOut)="onSignOut()"
+/>
+
+<!-- Main column: topbar (desktop) + content row + bottom nav (mobile) -->
+<div class="app-shell__column">
+  <!-- Desktop topbar — hidden on mobile via CSS -->
+  <app-topbar
+    class="app-shell__topbar"
+    [displayName]="displayName() ?? ''"
+    [email]="email() ?? ''"
+    (signOut)="onSignOut()"
+  />
+
+  <fav-app-search class="app-shell__mobile-search" />
+
+  <!-- Content row: page content + optional right rail -->
+  <div class="app-shell__content">
+    <main class="app-shell__main" id="main-content" tabindex="-1">
+      <ng-content />
+    </main>
+
+    <!-- Right rail — projected via [appRail]; hidden below 1280px -->
+    <aside class="app-shell__rail" aria-label="Side panel">
+      <ng-content select="[appRail]" />
+    </aside>
+  </div>
+
+  <!-- Mobile bottom nav — hidden on desktop via CSS -->
+  <app-bottom-nav
+    class="app-shell__bottom-nav"
+    (addClick)="onAddClick()"
+    (moreClick)="onMoreClick()"
+  />
+</div>

@@ -1,0 +1,12 @@
+<section
+  class="landing-section"
+  [class.landing-section--surface]="tone() === 'surface'"
+  [class.landing-section--alt]="tone() === 'alt'"
+  [class.landing-section--compact]="size() === 'compact'"
+  [class.landing-section--spacious]="size() === 'spacious'"
+  [attr.id]="id() ?? null"
+>
+  <div class="landing-section__inner">
+    <ng-content />
+  </div>
+</section>

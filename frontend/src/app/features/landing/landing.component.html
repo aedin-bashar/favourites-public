@@ -1,0 +1,53 @@
+<app-landing-shell>
+  <!-- Hero -->
+  <app-landing-section id="hero" tone="surface" size="spacious">
+    <div class="landing-hero">
+      <!-- Left copy column (~5/12) -->
+      <div class="landing-hero__copy">
+        <div class="landing-hero__eyebrow">
+          <i [class]="icons.Check" aria-hidden="true"></i>
+          Private. Secure. Just the links that matter.
+        </div>
+
+        <h1 class="landing-hero__title">
+          Your important links,<br>
+          <span class="landing-hero__title-accent">beautifully organized.</span>
+        </h1>
+
+        <p class="landing-hero__subtitle">
+          Save, organize, and archive your links. Access them from anywhere
+          and always find what you need — fast.
+        </p>
+
+        <div class="landing-hero__actions">
+          <a routerLink="/register" class="fav-btn fav-btn--primary fav-btn--lg landing-hero__cta-primary">
+            Register
+          </a>
+          <a routerLink="/login" class="fav-btn fav-btn--outline fav-btn--lg">
+            Sign in
+          </a>
+        </div>
+      </div>
+
+      <!-- Right preview (~7/12) -->
+      <div class="landing-hero__preview-wrap">
+        <fav-landing-preview />
+      </div>
+    </div>
+  </app-landing-section>
+
+  <!-- 4-card feature strip -->
+  <app-landing-section id="features">
+    <div class="landing-feature-strip">
+      @for (card of featureCards; track card.title) {
+        <article class="landing-feature-card">
+          <div class="landing-feature-card__icon">
+            <i [class]="card.icon" aria-hidden="true"></i>
+          </div>
+          <h3 class="landing-feature-card__title">{{ card.title }}</h3>
+          <p class="landing-feature-card__copy">{{ card.copy }}</p>
+        </article>
+      }
+    </div>
+  </app-landing-section>
+</app-landing-shell>

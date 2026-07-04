@@ -1,0 +1,27 @@
+.rail-widget {
+  background: var(--fav-color-surface);
+  border: var(--fav-border-width-regular) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-card);
+  padding: var(--fav-space-4);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--fav-space-3);
+  }
+
+  &__title {
+    font-size: var(--fav-text-rail-header-size);
+    font-weight: var(--fav-text-rail-header-weight);
+    text-transform: var(--fav-text-rail-header-transform);
+    letter-spacing: var(--fav-text-rail-header-spacing);
+    color: var(--fav-color-text-muted);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fav-space-2);
+  }
+}

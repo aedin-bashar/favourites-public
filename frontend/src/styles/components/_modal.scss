@@ -1,0 +1,252 @@
+// Reusable add/edit link modal style foundation.
+// Source: docs/UI_DESIGN_GUIDE.md §10, §12, §16 and reference
+// `design/Prompt Result 5 Add Edit Link Modals.png`.
+//
+// Style only — no Angular component yet. Markup will mount in Phase 2.
+// Variants:
+//   - default centered card modal (desktop + tablet add/edit link).
+//   - `fav-modal--mobile-full` full-screen sheet for mobile add link (§19).
+// Composes with .fav-form, .fav-field, .fav-badge--removable, .fav-btn,
+// and the loading/disabled helpers in `_states.scss`.
+
+@use '../tokens-breakpoints' as bp;
+
+// --- Backdrop --------------------------------------------------------------
+
+.fav-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background-color: var(--fav-color-text-heading);
+  opacity: 0.4;
+}
+
+// --- Dialog container ------------------------------------------------------
+// `.fav-modal` is the positioning shell; `.fav-modal__dialog` is the card.
+
+.fav-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--fav-space-5);
+  overflow-y: auto;
+
+  @include bp.up(md) {
+    align-items: center;
+    padding: var(--fav-space-7) var(--fav-space-5);
+  }
+}
+
+.fav-modal__dialog {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;          // ~512px — single-column form width
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+  box-shadow: var(--fav-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - var(--fav-space-7));
+  overflow: hidden;
+}
+
+.fav-modal--sm .fav-modal__dialog { max-width: 24rem; }
+.fav-modal--lg .fav-modal__dialog { max-width: 44rem; }
+
+// Mobile full-screen sheet (UI guide §19 — mobile add link form)
+.fav-modal--mobile-full {
+  @include bp.down(md) {
+    padding: 0;
+
+    .fav-modal__dialog {
+      max-width: none;
+      width: 100%;
+      max-height: 100dvh;
+      min-height: 100dvh;
+      border-radius: 0;
+      border-inline: 0;
+      box-shadow: none;
+    }
+  }
+}
+
+// --- Header ----------------------------------------------------------------
+
+.fav-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-5) var(--fav-space-5) var(--fav-space-3);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+.fav-modal__title {
+  margin: 0;
+  font-size: var(--fav-text-card-title-size);
+  font-weight: var(--fav-text-card-title-weight);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-snug);
+}
+
+.fav-modal__subtitle {
+  margin: 0.125rem 0 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+// Close icon button (UI guide §17 — xmark).
+.fav-modal__close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.25rem 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: var(--fav-radius-md);
+  color: var(--fav-color-text-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--fav-color-surface-alt);
+    color: var(--fav-color-text-heading);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fav-border-focus-ring);
+  }
+}
+
+// --- Body ------------------------------------------------------------------
+
+.fav-modal__body {
+  padding: var(--fav-space-5);
+  overflow-y: auto;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-gap-stack);
+}
+
+// --- Footer / actions ------------------------------------------------------
+// Desktop: aligned bottom-right. Mobile: full-width stacked (handled by the
+// existing `.fav-form-actions` mobile rule in `_forms.scss`).
+
+.fav-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-4) var(--fav-space-5);
+  border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+  background-color: var(--fav-color-surface-alt);
+}
+
+@include bp.down(sm) {
+  .fav-modal__footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    .fav-btn { width: 100%; }
+  }
+}
+
+// --- Tag chip input (Add/Edit link "tags" field) --------------------------
+// A bordered input-shaped area that wraps a row of removable tag badges and
+// a free-text input. Combine with .fav-badge--removable for each chip.
+
+.fav-tag-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  min-height: var(--fav-control-height);
+  padding: 0.25rem var(--fav-space-3);
+  background-color: var(--fav-color-surface);
+  color: var(--fav-color-text-body);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-md);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+
+  &:focus-within {
+    border-color: var(--fav-color-primary);
+    box-shadow: var(--fav-border-focus-ring);
+  }
+
+  &.is-invalid,
+  &[aria-invalid='true'] {
+    border-color: var(--fav-color-danger);
+
+    &:focus-within {
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+  }
+}
+
+.fav-tag-input__field {
+  flex: 1 1 6rem;
+  min-width: 6rem;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--fav-font-size-md);
+  color: inherit;
+  padding: 0.25rem 0;
+
+  &::placeholder {
+    color: var(--fav-color-text-muted);
+  }
+}
+
+// --- Scroll lock helper ----------------------------------------------------
+// Add on <body> while a modal is open so background content stops scrolling.
+
+.fav-modal-open {
+  overflow: hidden;
+}
+
+// --- Bottom filter sheet -------------------------------------------
+// Mobile-only bottom sheet used by the All Links filter toolbar.
+
+.fav-filter-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1060;
+  background-color: var(--fav-color-surface);
+  border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-xl) var(--fav-radius-xl) 0 0;
+  max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;
+  @include bp.up(md) { display: none; }
+}
+
+.fav-filter-sheet__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--fav-space-4);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+.fav-filter-sheet__title {
+  margin: 0; font-size: var(--fav-font-size-lg);
+  font-weight: var(--fav-font-weight-semibold); color: var(--fav-color-text-heading);
+}
+
+.fav-filter-sheet__body {
+  padding: var(--fav-space-4); display: flex; flex-direction: column; gap: var(--fav-space-4); flex: 1;
+}
+
+.fav-filter-sheet__footer {
+  padding: var(--fav-space-3) var(--fav-space-4);
+  border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+  display: flex; justify-content: flex-end; gap: var(--fav-space-3);
+}

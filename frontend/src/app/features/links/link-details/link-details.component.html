@@ -1,0 +1,267 @@
+<section class="link-details">
+  <nav class="link-details__back" aria-label="Back navigation">
+    <a routerLink="/app/links" class="fav-btn fav-btn--ghost fav-btn--sm">
+      <i [class]="icons.ChevronRight" class="fav-icon link-details__back-icon" aria-hidden="true"></i>
+      <span>Back to all links</span>
+    </a>
+  </nav>
+
+  @if (loading()) {
+    <div class="fav-loading link-details__loading" role="status" aria-live="polite">
+      <span class="fav-spinner" aria-hidden="true"></span>
+      <span>Loading link…</span>
+    </div>
+  } @else if (error(); as message) {
+    <div class="fav-alert fav-alert--danger link-details__alert" role="alert">
+      <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+      <div class="fav-alert__body">
+        <p class="link-details__alert-message">{{ message }}</p>
+        <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reload()">
+          Try again
+        </button>
+      </div>
+    </div>
+  } @else if (notFound()) {
+    <div class="fav-empty-state fav-empty-state--subtle link-details__empty">
+      <div class="fav-empty-state__icon" aria-hidden="true">
+        <i [class]="icons.EmptyBox"></i>
+      </div>
+      <h2 class="fav-empty-state__title">Link not found</h2>
+      <p class="fav-empty-state__message">
+        This link is no longer available, or it never existed.
+      </p>
+      <a routerLink="/app/links" class="fav-btn fav-btn--outline">Back to all links</a>
+    </div>
+  } @else if (link(); as current) {
+    @if (editing()) {
+      <article class="fav-card link-details__card" aria-labelledby="link-details-edit-title">
+        <header class="link-details__header">
+          <div class="link-details__heading">
+            <h1 class="link-details__title" id="link-details-edit-title">
+              Edit link
+            </h1>
+            <p class="link-details__domain">
+              <span>{{ current.title }}</span>
+            </p>
+          </div>
+        </header>
+
+        <app-edit-link-form
+          [link]="current"
+          (linkUpdated)="onLinkUpdated($event)"
+          (cancelled)="onEditCancelled()"
+        />
+      </article>
+    } @else {
+      <article class="fav-card link-details__card" [attr.aria-labelledby]="'link-details-' + current.id + '-title'">
+        <header class="link-details__header">
+          <div class="link-details__heading">
+            <h1
+              class="link-details__title"
+              [id]="'link-details-' + current.id + '-title'"
+            >
+              {{ current.title }}
+            </h1>
+            <p class="link-details__domain">
+              <i [class]="icons.Link" class="fav-icon" aria-hidden="true"></i>
+              <a
+                class="link-details__url"
+                [href]="current.url"
+                [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+              >
+                {{ domain() }}
+              </a>
+            </p>
+          </div>
+
+          @if (current.isArchived) {
+            <span class="fav-badge fav-badge--warning" aria-label="Archived link">
+              Archived
+            </span>
+          }
+        </header>
+
+        <dl class="link-details__meta">
+          <div class="link-details__meta-row">
+            <dt class="link-details__meta-label">URL</dt>
+            <dd class="link-details__meta-value">
+              <a
+                [href]="current.url"
+                [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+                class="link-details__full-url"
+              >
+                {{ current.url }}
+              </a>
+            </dd>
+          </div>
+
+          <div class="link-details__meta-row">
+            <dt class="link-details__meta-label">Saved</dt>
+            <dd class="link-details__meta-value">
+              <time [attr.datetime]="current.createdAtUtc">
+                {{ current.createdAtUtc | date: 'medium' }}
+              </time>
+            </dd>
+          </div>
+
+          @if (current.updatedAtUtc) {
+            <div class="link-details__meta-row">
+              <dt class="link-details__meta-label">Updated</dt>
+              <dd class="link-details__meta-value">
+                <time [attr.datetime]="current.updatedAtUtc">
+                  {{ current.updatedAtUtc | date: 'medium' }}
+                </time>
+              </dd>
+            </div>
+          }
+
+          @if (current.category; as category) {
+            <div class="link-details__meta-row">
+              <dt class="link-details__meta-label">Category</dt>
+              <dd class="link-details__meta-value">
+                <span class="fav-badge fav-badge--category">
+                  <i [class]="icons.Category" [style.color]="category.color" aria-hidden="true"></i>
+                  <span>{{ category.name }}</span>
+                </span>
+              </dd>
+            </div>
+          }
+        </dl>
+
+        @if (current.tags.length > 0) {
+          <section class="link-details__tag-block" aria-label="Tags">
+            <h2 class="link-details__section-title">Tags</h2>
+            <div class="fav-badge-list">
+              @for (tag of current.tags; track tag.id) {
+                <span class="fav-badge fav-badge--tag">
+                  <i [class]="icons.Tag" aria-hidden="true"></i>
+                  <span>{{ tag.name }}</span>
+                </span>
+              }
+            </div>
+          </section>
+        }
+
+        @if (current.description) {
+          <section class="link-details__description-block" aria-label="Link description">
+            <h2 class="link-details__section-title">Description</h2>
+            <p class="link-details__description">{{ current.description }}</p>
+          </section>
+        }
+
+        @if (archiveError(); as message) {
+          <div class="fav-alert fav-alert--danger" role="alert">
+            <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+            <div class="fav-alert__body">{{ message }}</div>
+          </div>
+        }
+
+        @if (!deleteConfirmOpen() && deleteError(); as message) {
+          <div class="fav-alert fav-alert--danger" role="alert">
+            <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+            <div class="fav-alert__body">{{ message }}</div>
+          </div>
+        }
+
+        <footer class="link-details__actions fav-btn-group" role="group" aria-label="Link actions">
+          <a
+            class="fav-btn fav-btn--primary"
+            [href]="current.url"
+            [target]="preferences().openInNewTab ? '_blank' : '_self'"
+            [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+          >
+            <i [class]="icons.OpenLink" aria-hidden="true"></i>
+            <span>Open link</span>
+          </a>
+          <button type="button" class="fav-btn fav-btn--outline" (click)="startEditing()">
+            <i [class]="icons.Edit" aria-hidden="true"></i>
+            <span>Edit</span>
+          </button>
+          <button
+            type="button"
+            class="fav-btn fav-btn--outline"
+            [disabled]="archiving()"
+            (click)="toggleArchive()"
+          >
+            <i [class]="current.isArchived ? icons.Restore : icons.Archive" aria-hidden="true"></i>
+            <span>{{ current.isArchived ? 'Restore' : 'Archive' }}</span>
+          </button>
+          <button
+            type="button"
+            class="fav-btn fav-btn--outline link-details__delete"
+            (click)="openDeleteConfirm()"
+          >
+            <i [class]="icons.Delete" aria-hidden="true"></i>
+            <span>Delete</span>
+          </button>
+        </footer>
+      </article>
+    }
+
+    @if (deleteConfirmOpen()) {
+      <div class="fav-modal-backdrop" (click)="closeDeleteConfirm()"></div>
+      <div
+        class="fav-modal fav-modal--sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="link-details-delete-title"
+      >
+        <div class="fav-modal__dialog" favFocusTrap>
+          <div class="fav-modal__header">
+            <div>
+              <h2 class="fav-modal__title" id="link-details-delete-title">Delete this link?</h2>
+              <p class="fav-modal__subtitle">This action cannot be undone.</p>
+            </div>
+            <button
+              type="button"
+              class="fav-modal__close"
+              aria-label="Close"
+              [disabled]="deleting()"
+              (click)="closeDeleteConfirm()"
+            >
+              <i [class]="icons.Close" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="fav-modal__body">
+            <p class="link-details__delete-prompt">
+              You are about to permanently delete <strong>{{ current.title }}</strong>.
+            </p>
+            @if (deleteError(); as message) {
+              <div class="fav-alert fav-alert--danger" role="alert">
+                <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+                <div class="fav-alert__body">{{ message }}</div>
+              </div>
+            }
+          </div>
+
+          <div class="fav-modal__footer">
+            <button
+              type="button"
+              class="fav-btn fav-btn--outline"
+              [disabled]="deleting()"
+              (click)="closeDeleteConfirm()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="fav-btn fav-btn--danger"
+              [class.is-loading]="deleting()"
+              [disabled]="deleting()"
+              (click)="confirmDelete()"
+            >
+              @if (deleting()) {
+                <span class="fav-spinner" aria-hidden="true"></span>
+                <span class="fav-sr-only">Deleting link…</span>
+              }
+              <span class="fav-btn__label">Delete link</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</section>

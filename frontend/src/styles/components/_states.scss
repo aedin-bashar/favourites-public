@@ -1,0 +1,197 @@
+// Validation, error, loading, and disabled-state styles.
+// Source: docs/UI_DESIGN_GUIDE.md §16 (validation) and §18 (accessibility).
+
+// --- Field invalid state ----------------------------------------------------
+// Red border + red helper text. Pair with aria-invalid="true" on the input.
+
+.fav-input.is-invalid,
+.fav-select.is-invalid,
+.fav-textarea.is-invalid,
+.fav-input[aria-invalid='true'],
+.fav-select[aria-invalid='true'],
+.fav-textarea[aria-invalid='true'] {
+  border-color: var(--fav-color-danger);
+
+  &:focus,
+  &:focus-visible {
+    border-color: var(--fav-color-danger);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+}
+
+.fav-field-error {
+  display: block;
+  margin-top: var(--fav-space-1);
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-danger);
+  line-height: var(--fav-line-height-snug);
+}
+
+// --- Field success state (optional — confirmation in account/security) -----
+
+.fav-input.is-valid,
+.fav-select.is-valid,
+.fav-textarea.is-valid {
+  border-color: var(--fav-color-success);
+}
+
+.fav-field-success {
+  display: block;
+  margin-top: var(--fav-space-1);
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-success);
+}
+
+// --- Global alerts ---------------------------------------------------------
+// Alert / toast surfaces for non-field errors and confirmations.
+// UI guide §16: global errors appear as alerts, not browser alerts.
+
+.fav-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-3) var(--fav-space-4);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-md);
+  background-color: var(--fav-color-surface);
+  color: var(--fav-color-text-body);
+  font-size: var(--fav-font-size-md);
+  line-height: var(--fav-line-height-snug);
+}
+
+.fav-alert__icon {
+  flex: 0 0 auto;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.fav-alert__body {
+  flex: 1 1 auto;
+}
+
+.fav-alert__title {
+  margin: 0 0 0.125rem;
+  font-weight: var(--fav-font-weight-semibold);
+  color: inherit;
+}
+
+.fav-alert--info {
+  background-color: #EAF1FF;
+  color: #0A58CA;
+  border-color: transparent;
+}
+
+.fav-alert--success {
+  background-color: #E4F5EB;
+  color: #146C43;
+  border-color: transparent;
+}
+
+.fav-alert--warning {
+  background-color: #FEF3CD;
+  color: #8A5A00;
+  border-color: transparent;
+}
+
+.fav-alert--danger {
+  background-color: #FBE2E5;
+  color: #B02A37;
+  border-color: transparent;
+}
+
+// --- Loading states --------------------------------------------------------
+// Use .fav-loading on a container to show an aria-live spinner. Buttons in
+// loading state combine .fav-btn with .is-loading and add a spinner span.
+
+.fav-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: fav-spinner-rotate 0.75s linear infinite;
+  vertical-align: -0.15em;
+}
+
+.fav-spinner--sm { width: 0.75rem; height: 0.75rem; border-width: 2px; }
+.fav-spinner--lg { width: 1.5rem;  height: 1.5rem;  border-width: 3px; }
+
+@keyframes fav-spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fav-spinner {
+    animation-duration: 1.5s;
+  }
+}
+
+// Button with a leading spinner — keeps width stable while loading.
+.fav-btn.is-loading {
+  position: relative;
+  pointer-events: none;
+
+  .fav-btn__label {
+    visibility: hidden;
+  }
+
+  .fav-spinner {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+  }
+}
+
+// Full-area loading block (lists, cards, panels).
+.fav-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fav-space-2);
+  padding: var(--fav-space-6);
+  color: var(--fav-color-text-muted);
+}
+
+// Skeleton placeholder — used for line-level loading shimmer.
+.fav-skeleton {
+  display: block;
+  height: 0.75rem;
+  border-radius: var(--fav-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--fav-color-surface-alt) 0%,
+    var(--fav-color-border) 50%,
+    var(--fav-color-surface-alt) 100%
+  );
+  background-size: 200% 100%;
+  animation: fav-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.fav-skeleton--title { height: 1.125rem; width: 60%; }
+.fav-skeleton--line  { height: 0.75rem;  width: 100%; }
+.fav-skeleton--avatar {
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: var(--fav-radius-pill);
+}
+
+@keyframes fav-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fav-skeleton {
+    animation: none;
+    background: var(--fav-color-surface-alt);
+  }
+}
+
+// --- Disabled state --------------------------------------------------------
+
+.is-disabled,
+[aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

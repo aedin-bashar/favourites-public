@@ -1,0 +1,67 @@
+// Icon styling rules — Font Awesome Free
+// Source: docs/UI_DESIGN_GUIDE.md §17
+//
+// Rules:
+// - Font Awesome Free only (no Pro variants).
+// - Use a single style family per icon to keep stroke/fill consistent.
+// - Provide accessible labels (aria-label) on icon-only buttons.
+// - Match icon color to the surrounding text color via `currentColor`.
+
+// Default icon sizing inside buttons and inline text.
+.fav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  color: currentColor;
+}
+
+// Icon size scale — independent of the underlying FA classes so consumers
+// can pick a size token without reaching into Bootstrap font utilities.
+.fav-icon--xs { font-size: 0.75rem; }   // 12px
+.fav-icon--sm { font-size: 0.875rem; }  // 14px
+.fav-icon--md { font-size: 1rem; }      // 16px — default
+.fav-icon--lg { font-size: 1.25rem; }   // 20px — button leading icons
+.fav-icon--xl { font-size: 1.5rem; }    // 24px — page headings
+.fav-icon--2xl { font-size: 2rem; }     // 32px — empty-state illustrations
+
+// Inline spacing — pairs icon + label in buttons / list rows.
+.fav-icon + .fav-icon-label,
+.fav-icon-label + .fav-icon {
+  margin-inline-start: 0.5rem;
+}
+
+// Icon-only buttons — round target, no label, requires aria-label.
+.fav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--fav-control-height);
+  height: var(--fav-control-height);
+  padding: 0;
+  border-radius: var(--fav-radius-sm);
+  background: transparent;
+  border: var(--fav-border-width-thin) solid transparent;
+  color: var(--fav-color-text-body);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+
+  &:hover {
+    background: var(--fav-color-surface-alt);
+    color: var(--fav-color-text-heading);
+    border-color: var(--fav-color-border);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fav-border-focus-ring);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

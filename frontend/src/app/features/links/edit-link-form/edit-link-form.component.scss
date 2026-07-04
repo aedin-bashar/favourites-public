@@ -1,0 +1,26 @@
+// Edit-link form — Tasks 2.52, 2.53.
+// Most styling comes from the global .fav-form / .fav-input / .fav-btn
+// utilities; this file only holds form-specific layout overrides.
+
+.edit-link-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-gap-stack);
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--fav-space-3);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .edit-link-form__actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    .fav-btn {
+      width: 100%;
+    }
+  }
+}

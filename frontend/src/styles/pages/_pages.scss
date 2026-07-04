@@ -1,0 +1,6 @@
+// Barrel — forwards page-level style foundations.
+// Consumed by `src/styles.scss`.
+
+@forward 'page-header';
+@forward 'index-list';
+@forward 'settings';

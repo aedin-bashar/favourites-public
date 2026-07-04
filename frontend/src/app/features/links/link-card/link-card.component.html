@@ -1,0 +1,133 @@
+@let current = link();
+
+<article class="fav-card link-card" [attr.aria-labelledby]="'link-card-' + current.id + '-title'">
+  <header class="link-card__header">
+    <div class="link-card__heading">
+      <a
+        class="link-card__title"
+        [id]="'link-card-' + current.id + '-title'"
+        [href]="current.url"
+        [target]="preferences().openInNewTab ? '_blank' : '_self'"
+        [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+        (click)="onOpen()"
+      >
+        {{ current.title }}
+      </a>
+      <p class="link-card__domain">
+        @if (preferences().showFavicon) {
+          <img
+            class="link-card__favicon"
+            [src]="current.url | faviconUrl"
+            alt=""
+            width="16"
+            height="16"
+            loading="lazy"
+            (error)="onFaviconError($event)"
+          />
+          <i [class]="icons.Link" class="fav-icon link-card__favicon-fallback" aria-hidden="true" style="display:none"></i>
+        } @else {
+          <i [class]="icons.Link" class="fav-icon link-card__favicon-fallback" aria-hidden="true"></i>
+        }
+        <span>{{ domain() }}</span>
+      </p>
+    </div>
+
+    @if (current.isArchived) {
+      <span class="fav-badge fav-badge--warning link-card__archived" aria-label="Archived link">
+        Archived
+      </span>
+    }
+  </header>
+
+  @if (current.description) {
+    <p class="link-card__description">{{ current.description }}</p>
+  }
+
+  @if (current.tags.length > 0 || current.category) {
+    <div class="fav-badge-list link-card__tags" aria-label="Tags and category">
+      @if (current.category; as category) {
+        <span class="fav-badge fav-badge--category">
+          <i [class]="icons.Category" [style.color]="category.color" aria-hidden="true"></i>
+          <span>{{ category.name }}</span>
+        </span>
+      }
+      @for (tag of current.tags; track tag.id) {
+        <span class="fav-badge fav-badge--tag">
+          <i [class]="icons.Tag" aria-hidden="true"></i>
+          <span>{{ tag.name }}</span>
+        </span>
+      }
+    </div>
+  }
+
+  <footer class="link-card__footer">
+    <p class="link-card__meta">
+      <span class="link-card__meta-label">Saved</span>
+      <time [attr.datetime]="current.createdAtUtc">
+        {{ current.createdAtUtc | date: 'mediumDate' }}
+      </time>
+      @if (current.updatedAtUtc) {
+        <span class="link-card__meta-separator" aria-hidden="true">·</span>
+        <span class="link-card__meta-label">Updated</span>
+        <time [attr.datetime]="current.updatedAtUtc">
+          {{ current.updatedAtUtc | date: 'mediumDate' }}
+        </time>
+      }
+    </p>
+
+    <div class="link-card__actions fav-btn-group" role="group" aria-label="Link actions">
+      <a
+        class="fav-btn fav-btn--ghost fav-btn--icon"
+        [href]="current.url"
+        [target]="preferences().openInNewTab ? '_blank' : '_self'"
+        [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+        [attr.aria-label]="'Open ' + current.title"
+        [attr.title]="'Open ' + current.title"
+        (click)="onOpen()"
+      >
+        <i [class]="icons.OpenLink" aria-hidden="true"></i>
+      </a>
+      <button
+        type="button"
+        class="fav-btn fav-btn--ghost fav-btn--icon"
+        [attr.aria-label]="'Edit ' + current.title"
+        [attr.title]="'Edit ' + current.title"
+        (click)="onEdit()"
+      >
+        <i [class]="icons.Edit" aria-hidden="true"></i>
+      </button>
+      @if (current.isArchived) {
+        <button
+          type="button"
+          class="fav-btn fav-btn--ghost fav-btn--icon"
+          [attr.aria-label]="'Restore ' + current.title"
+          [attr.title]="'Restore ' + current.title"
+          [disabled]="archiveBusy()"
+          (click)="onRestore()"
+        >
+          <i [class]="icons.Restore" aria-hidden="true"></i>
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="fav-btn fav-btn--ghost fav-btn--icon"
+          [attr.aria-label]="'Archive ' + current.title"
+          [attr.title]="'Archive ' + current.title"
+          [disabled]="archiveBusy()"
+          (click)="onArchive()"
+        >
+          <i [class]="icons.Archive" aria-hidden="true"></i>
+        </button>
+      }
+      <button
+        type="button"
+        class="fav-btn fav-btn--ghost fav-btn--icon link-card__delete"
+        [attr.aria-label]="'Delete ' + current.title"
+        [attr.title]="'Delete ' + current.title"
+        (click)="onDelete()"
+      >
+        <i [class]="icons.Delete" aria-hidden="true"></i>
+      </button>
+    </div>
+  </footer>
+</article>

@@ -1,0 +1,207 @@
+// Reusable form and input styles — UI_DESIGN_GUIDE.md §12.
+// Clear labels, consistent input heights, visible focus, helper text.
+
+.fav-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-gap-stack);
+}
+
+// --- Field grouping ---------------------------------------------------------
+
+.fav-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-1);
+}
+
+.fav-field--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--fav-space-2);
+}
+
+// --- Label ------------------------------------------------------------------
+
+.fav-label {
+  font-size: var(--fav-text-label-size);
+  font-weight: var(--fav-text-label-weight);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-snug);
+}
+
+.fav-label__required {
+  color: var(--fav-color-danger);
+  margin-inline-start: 0.125rem;
+}
+
+// --- Helper / hint text -----------------------------------------------------
+
+.fav-help {
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+  line-height: var(--fav-line-height-snug);
+}
+
+// --- Inputs -----------------------------------------------------------------
+
+.fav-input,
+.fav-select,
+.fav-textarea {
+  display: block;
+  width: 100%;
+  min-height: var(--fav-control-height);
+  padding: var(--fav-space-2) var(--fav-space-3);
+  background-color: var(--fav-color-surface);
+  color: var(--fav-color-text-body);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-md);
+  font-family: inherit;
+  font-size: var(--fav-font-size-md);
+  line-height: var(--fav-line-height-normal);
+  transition: border-color 120ms ease, box-shadow 120ms ease,
+              background-color 120ms ease;
+
+  &::placeholder {
+    color: var(--fav-color-text-muted);
+    opacity: 1;
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: var(--fav-color-text-muted);
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: var(--fav-color-primary);
+    box-shadow: var(--fav-border-focus-ring);
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: var(--fav-color-surface-alt);
+    color: var(--fav-color-text-muted);
+    cursor: not-allowed;
+  }
+}
+
+.fav-textarea {
+  min-height: 6rem;
+  resize: vertical;
+  padding-block: var(--fav-space-3);
+}
+
+// Edge/IE render their own reveal ("eye") and clear ("x") buttons inside
+// password/text inputs, which duplicates our custom show-password toggle.
+.fav-input::-ms-reveal,
+.fav-input::-ms-clear {
+  display: none;
+}
+
+// Input with a leading or trailing icon (search box, etc.)
+.fav-input-group {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+
+  .fav-input {
+    flex: 1 1 auto;
+  }
+
+  .fav-input-group__icon {
+    position: absolute;
+    inset-block: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--fav-control-height);
+    color: var(--fav-color-text-muted);
+    pointer-events: none;
+  }
+
+  &--icon-leading .fav-input-group__icon {
+    inset-inline-start: 0;
+  }
+  &--icon-leading .fav-input {
+    padding-inline-start: var(--fav-control-height);
+  }
+
+  &--icon-trailing .fav-input-group__icon {
+    inset-inline-end: 0;
+  }
+  &--icon-trailing .fav-input {
+    padding-inline-end: var(--fav-control-height);
+  }
+
+  .fav-input-group__btn {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--fav-control-height);
+    background: none;
+    border: none;
+    color: var(--fav-color-text-muted);
+    cursor: pointer;
+    padding: 0;
+    border-radius: 0 var(--fav-radius-md) var(--fav-radius-md) 0;
+
+    &:hover {
+      color: var(--fav-color-text-body);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--fav-border-focus-ring);
+    }
+  }
+}
+
+// --- Checkbox / radio ------------------------------------------------------
+
+.fav-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fav-space-2);
+  font-size: var(--fav-font-size-md);
+  color: var(--fav-color-text-body);
+  cursor: pointer;
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--fav-color-primary);
+    margin: 0;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--fav-border-focus-ring);
+      border-radius: var(--fav-radius-xs);
+    }
+  }
+}
+
+// --- Form actions (modal footer, submit row) -------------------------------
+
+.fav-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fav-space-3);
+  padding-top: var(--fav-space-3);
+}
+
+@media (max-width: 575.98px) {
+  .fav-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+
+    .fav-btn {
+      width: 100%;
+    }
+  }
+}

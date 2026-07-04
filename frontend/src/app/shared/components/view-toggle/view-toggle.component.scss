@@ -1,0 +1,33 @@
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--fav-color-bg-page);
+  border: var(--fav-border-width-regular) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-pill);
+  padding: 0.1875rem; // 3px inner gap around buttons
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: var(--fav-radius-pill);
+    background: transparent;
+    color: var(--fav-color-text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    font-size: 0.875rem;
+
+    &:hover:not(&--active) {
+      color: var(--fav-color-text-body);
+    }
+
+    &--active {
+      background: var(--fav-color-surface);
+      color: var(--fav-color-primary);
+      box-shadow: var(--fav-shadow-xs);
+    }
+  }
+}

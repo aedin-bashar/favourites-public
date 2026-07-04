@@ -1,0 +1,16 @@
+<app-shell
+  [displayName]="displayName()"
+  [email]="email()"
+  (signOut)="onSignOut()"
+  (addClick)="onAddClick()"
+  (moreClick)="onMoreClick()"
+>
+  <router-outlet />
+</app-shell>
+
+@if (moreOpen()) {
+  <fav-more-sheet
+    (close)="closeMore()"
+    (signOut)="onSignOut()"
+  />
+}

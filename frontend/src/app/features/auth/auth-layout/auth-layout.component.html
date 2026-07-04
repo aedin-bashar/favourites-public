@@ -1,0 +1,23 @@
+<div class="auth-layout">
+  <a class="auth-layout__brand" routerLink="/">
+    <i [class]="icons.Heart" class="auth-layout__brand-mark" aria-hidden="true"></i>
+    <span class="auth-layout__brand-name">{{ productName() }}</span>
+  </a>
+
+  <main class="auth-layout__card fav-card" id="main-content">
+    <header class="auth-layout__header">
+      <h1 class="auth-layout__heading">
+        <ng-content select="[authLayoutHeading]" />
+      </h1>
+      <p class="auth-layout__subheading">
+        <ng-content select="[authLayoutSubheading]" />
+      </p>
+    </header>
+
+    <ng-content />
+  </main>
+
+  <footer class="auth-layout__footer">
+    <ng-content select="[authLayoutFooter]" />
+  </footer>
+</div>

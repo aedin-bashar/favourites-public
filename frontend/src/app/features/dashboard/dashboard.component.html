@@ -1,0 +1,331 @@
+@let recent = recentLinks();
+@let tagItems = commonTags();
+@let categoryItems = topCategories();
+@let week = thisWeek();
+
+<div class="dashboard">
+
+  <!-- ── Welcome header ─────────────────────────────────────── -->
+  <header class="dashboard__welcome">
+    <div>
+      <h1 class="dashboard__welcome-title">
+        @if (displayName(); as name) {
+          Welcome, {{ name }} 👋
+        } @else {
+          Welcome to Favourites 👋
+        }
+      </h1>
+      <p class="dashboard__welcome-subtitle">
+        Your favourite links, organised and always within reach.
+      </p>
+    </div>
+  </header>
+
+  <!-- ── Main + right-rail grid ─────────────────────────────── -->
+  <div class="dashboard__layout">
+
+    <!-- ── Main column ─────────────────────────────────────────────── -->
+    <div class="dashboard__main">
+
+      <!-- Quick save -->
+      <form
+        class="dashboard__quick-save fav-panel"
+        [formGroup]="quickAddForm"
+        (ngSubmit)="onQuickAddSubmit()"
+        aria-labelledby="dashboard-quick-save-title"
+        novalidate
+      >
+        <div class="dashboard__quick-save-header">
+          <div class="dashboard__quick-save-icon-wrap">
+            <i [class]="icons.SaveLink" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h2 class="dashboard__quick-save-title" id="dashboard-quick-save-title">Quick save</h2>
+            <p class="dashboard__quick-save-hint">Paste a URL to save it later</p>
+          </div>
+        </div>
+        <div class="dashboard__quick-save-row">
+          <label for="dashboard-quick-save-url" class="fav-sr-only">URL to save</label>
+          <input
+            id="dashboard-quick-save-url"
+            class="fav-input dashboard__quick-save-input"
+            type="url"
+            inputmode="url"
+            autocomplete="url"
+            placeholder="https://example.com/article"
+            formControlName="url"
+            [class.is-invalid]="quickAddForm.controls.url.invalid && quickAddForm.controls.url.touched"
+            [attr.aria-invalid]="
+              quickAddForm.controls.url.invalid && quickAddForm.controls.url.touched ? 'true' : null
+            "
+            aria-describedby="dashboard-quick-save-error dashboard-quick-save-success"
+          />
+          <button
+            type="submit"
+            class="fav-btn fav-btn--primary dashboard__quick-save-submit"
+            [class.is-loading]="quickAddSubmitting()"
+            [disabled]="quickAddSubmitting()"
+          >
+            @if (quickAddSubmitting()) {
+              <span class="fav-spinner" aria-hidden="true"></span>
+              <span class="fav-sr-only">Saving link…</span>
+            } @else {
+              <i [class]="icons.AddLink" class="fav-icon" aria-hidden="true"></i>
+            }
+            <span>Save link</span>
+          </button>
+        </div>
+        @if (quickAddForm.controls.url.touched && quickAddForm.controls.url.hasError('required')) {
+          <span id="dashboard-quick-save-error" class="fav-field-error">A URL is required.</span>
+        } @else if (quickAddForm.controls.url.touched && quickAddForm.controls.url.hasError('maxlength')) {
+          <span id="dashboard-quick-save-error" class="fav-field-error">
+            URL must be 2048 characters or fewer.
+          </span>
+        } @else if (quickAddForm.controls.url.touched && quickAddForm.controls.url.hasError('url')) {
+          <span id="dashboard-quick-save-error" class="fav-field-error">
+            Enter a valid http or https URL.
+          </span>
+        } @else if (quickAddError(); as message) {
+          <span id="dashboard-quick-save-error" class="fav-field-error" role="alert">{{ message }}</span>
+        } @else if (quickAddSuccess(); as saved) {
+          <p id="dashboard-quick-save-success" class="dashboard__quick-save-success" role="status">
+            Saved <strong>{{ saved.title }}</strong>.
+            <a [routerLink]="['/app/links', saved.id]" (click)="dismissQuickAddSuccess()">
+              Edit details
+            </a>
+          </p>
+        }
+      </form>
+
+      <!-- Stat cards -->
+      <div class="dashboard__stat-cards" aria-label="Summary statistics">
+        <fav-stat-card
+          label="Total links"
+          [value]="summaryLoading() ? '…' : totalLinks()"
+          icon="fa-link"
+          tone="teal"
+          link="/app/links"
+        />
+        <fav-stat-card
+          label="Tags"
+          [value]="summaryLoading() ? '…' : totalTags()"
+          icon="fa-tag"
+          tone="indigo"
+          link="/app/tags"
+        />
+        <fav-stat-card
+          label="Categories"
+          [value]="summaryLoading() ? '…' : totalCategories()"
+          icon="fa-folder"
+          tone="amber"
+          link="/app/categories"
+        />
+        <fav-stat-card
+          label="Archived"
+          [value]="summaryLoading() ? '…' : totalArchived()"
+          icon="fa-box-archive"
+          tone="rose"
+          link="/app/archived"
+        />
+      </div>
+
+      <!-- Recently added -->
+      <section class="fav-panel dashboard__recent-panel" aria-labelledby="dashboard-recent-title">
+        <header class="fav-panel__header">
+          <h2 class="fav-panel__title" id="dashboard-recent-title">Recently added</h2>
+          <a class="dashboard__panel-link" [routerLink]="['/app/links']">
+            View all ›
+          </a>
+        </header>
+
+        @if (linksLoading()) {
+          <div class="fav-loading" role="status" aria-live="polite">
+            <span class="fav-spinner" aria-hidden="true"></span>
+            <span>Loading your recent links…</span>
+          </div>
+        } @else if (linksError(); as message) {
+          <div class="fav-alert fav-alert--danger" role="alert">
+            <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+            <div class="fav-alert__body">
+              <p>{{ message }}</p>
+              <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reloadLinks()">
+                Try again
+              </button>
+            </div>
+          </div>
+        } @else if (recent.length === 0) {
+          <div class="fav-empty-state fav-empty-state--subtle fav-empty-state--compact">
+            <div class="fav-empty-state__icon" aria-hidden="true">
+              <i [class]="icons.SaveLink"></i>
+            </div>
+            <h3 class="fav-empty-state__title">No links saved yet</h3>
+            <p class="fav-empty-state__message">
+              Paste a URL above to save your first link and see it appear here.
+            </p>
+          </div>
+        } @else {
+          <ul class="dashboard__recent-list" aria-label="Recently added links">
+            @for (link of recent; track trackLinkById($index, link)) {
+              <li class="dashboard__recent-item">
+                <!-- Favicon -->
+                <div class="dashboard__recent-favicon" aria-hidden="true">
+                  @if (preferences().showFavicon) {
+                    <img
+                      [src]="link.url | faviconUrl"
+                      alt=""
+                      width="20"
+                      height="20"
+                      loading="lazy"
+                      (error)="$any($event.target).style.display='none'"
+                    />
+                  } @else {
+                    <i [class]="icons.Link" class="fav-icon" aria-hidden="true"></i>
+                  }
+                </div>
+                <div class="dashboard__recent-body">
+                  <a
+                    class="dashboard__recent-title"
+                    [href]="link.url"
+                    [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                    [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+                  >{{ link.title }}</a>
+                  <p class="dashboard__recent-domain">{{ domainOf(link.url) }}</p>
+                </div>
+                <!-- Tag badges -->
+                @if (link.tags.length > 0) {
+                  <div class="dashboard__recent-tags" aria-label="Tags">
+                    @for (tag of link.tags; track tag.id) {
+                      <span class="fav-badge fav-badge--tag">{{ tag.name }}</span>
+                    }
+                  </div>
+                }
+                <time class="dashboard__recent-date" [attr.datetime]="link.createdAtUtc">
+                  {{ link.createdAtUtc | date: 'mediumDate' }}
+                </time>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- This week -->
+      <section class="fav-panel dashboard__this-week" aria-labelledby="dashboard-this-week-title">
+        <header class="fav-panel__header">
+          <h2 class="fav-panel__title" id="dashboard-this-week-title">This week</h2>
+          <span class="dashboard__this-week-label">Last 7 days</span>
+        </header>
+        <div class="dashboard__this-week-grid">
+          <div class="dashboard__this-week-stat">
+            <span class="dashboard__this-week-value">
+              {{ summaryLoading() ? '…' : (week?.linksAdded ?? 0) }}
+            </span>
+            <span class="dashboard__this-week-name">Links added</span>
+          </div>
+          <div class="dashboard__this-week-stat">
+            <span class="dashboard__this-week-value">
+              {{ summaryLoading() ? '…' : (week?.categoriesCreated ?? 0) }}
+            </span>
+            <span class="dashboard__this-week-name">Categories created</span>
+          </div>
+          <div class="dashboard__this-week-stat">
+            <span class="dashboard__this-week-value">
+              {{ summaryLoading() ? '…' : (week?.tagsCreated ?? 0) }}
+            </span>
+            <span class="dashboard__this-week-name">Tags created</span>
+          </div>
+          <div class="dashboard__this-week-stat">
+            <span class="dashboard__this-week-value">
+              {{ summaryLoading() ? '…' : (week?.linksArchived ?? 0) }}
+            </span>
+            <span class="dashboard__this-week-name">Links archived</span>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /.dashboard__main -->
+
+    <!-- ── Right rail ────────────────────────────────────────── -->
+    <fav-right-rail class="dashboard__rail">
+
+      <!-- Common tags widget -->
+      <fav-rail-widget title="COMMON TAGS">
+        <a slot="action" class="fav-rail-widget__action" [routerLink]="['/app/tags']">
+          Manage tags ›
+        </a>
+        @if (tagItems.length === 0) {
+          <p class="dashboard__rail-empty">No tags yet.</p>
+        } @else {
+          <ul class="dashboard__tag-list" aria-label="Common tags">
+            @for (tag of tagItems; track trackCountedById($index, tag)) {
+              <li class="dashboard__tag-item">
+                <span class="fav-badge fav-badge--tag">{{ tag.name }}</span>
+                <span class="fav-badge fav-badge--count" [attr.aria-label]="tag.count + ' links'">
+                  {{ tag.count }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </fav-rail-widget>
+
+      <!-- Categories widget -->
+      <fav-rail-widget title="CATEGORIES">
+        <a slot="action" class="fav-rail-widget__action" [routerLink]="['/app/categories']">
+          Manage categories ›
+        </a>
+        @if (categoryItems.length === 0) {
+          <p class="dashboard__rail-empty">No categories yet.</p>
+        } @else {
+          <ul class="dashboard__category-list" aria-label="Categories">
+            @for (cat of categoryItems; track trackCountedById($index, cat)) {
+              <li class="dashboard__category-item">
+                <span class="dashboard__category-name">
+                  <i [class]="icons.Category" [style.color]="cat.color ?? null" aria-hidden="true"></i>
+                  {{ cat.name }}
+                </span>
+                <span class="fav-badge fav-badge--count" [attr.aria-label]="cat.count + ' links'">
+                  {{ cat.count }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </fav-rail-widget>
+
+      <!-- Quick access widget -->
+      <fav-rail-widget title="QUICK ACCESS">
+        <nav aria-label="Quick access links">
+          <ul class="dashboard__quick-access">
+            <li>
+              <a [routerLink]="['/app/links']" class="dashboard__quick-access-link">
+                <i [class]="icons.AllLinks" aria-hidden="true"></i>
+                <span>All Links</span>
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/app/tags']" class="dashboard__quick-access-link">
+                <i [class]="icons.Tags" aria-hidden="true"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/app/categories']" class="dashboard__quick-access-link">
+                <i [class]="icons.Categories" aria-hidden="true"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+            <li>
+              <a [routerLink]="['/app/archived']" class="dashboard__quick-access-link">
+                <i [class]="icons.Archived" aria-hidden="true"></i>
+                <span>Archived</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </fav-rail-widget>
+
+    </fav-right-rail>
+
+  </div><!-- /.dashboard__layout -->
+
+</div><!-- /.dashboard -->

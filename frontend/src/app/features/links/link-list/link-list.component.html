@@ -1,0 +1,720 @@
+<section class="link-list">
+
+  <!-- ── Page header ──────────────────────────────────────── -->
+  <header class="fav-page-header link-list__header">
+    <div class="fav-page-header__text">
+            <h1 class="fav-page-header__title">{{ pageTitle() }}</h1>
+      <p class="fav-page-header__subtitle">
+        Browse, search, filter, and manage everything you've saved.
+      </p>
+    </div>
+    <div class="fav-page-header__actions">
+      <button
+        type="button"
+        class="fav-btn fav-btn--outline"
+        (click)="openImportModal()"
+        aria-label="Import bookmarks"
+      >
+        <i class="fa-solid fa-file-import fav-icon" aria-hidden="true"></i>
+        <span>Import bookmarks</span>
+      </button>
+      <button type="button" class="fav-btn fav-btn--primary" (click)="openAddLink()">
+        <i [class]="icons.AddLink" class="fav-icon" aria-hidden="true"></i>
+        <span>Add link</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main + right-rail layout ────────────────────────── -->
+  <div class="link-list__layout">
+
+    <!-- ── Main column ───────────────────────────────────────────────────── -->
+    <div class="link-list__main">
+
+      <!-- Archive error alert -->
+      @if (archiveError(); as message) {
+        <div class="fav-alert fav-alert--danger link-list__alert" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">{{ message }}</div>
+        </div>
+      }
+
+      <!-- Delete error alert (shown here when the confirm modal is skipped) -->
+      @if (!deleteTarget() && deleteError(); as message) {
+        <div class="fav-alert fav-alert--danger link-list__alert" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">{{ message }}</div>
+        </div>
+      }
+
+      <!-- ── Filter toolbar — desktop ───────────────────────────── -->
+      <div class="link-list__toolbar link-list__toolbar--desktop"
+           role="region" aria-label="Search, filter, and sort links">
+
+        <!-- Search input -->
+        <div class="link-list__search">
+          <label for="link-list-search" class="fav-sr-only">Search your links</label>
+          <div class="link-list__search-field">
+            <i [class]="icons.Search" class="link-list__search-icon" aria-hidden="true"></i>
+            <input
+              id="link-list-search"
+              type="search"
+              class="fav-input link-list__search-input"
+              placeholder="Search by title, description, or URL"
+              autocomplete="off"
+              [formControl]="searchControl"
+            />
+            @if (searchControl.value) {
+              <button
+                type="button"
+                class="link-list__search-clear"
+                aria-label="Clear search"
+                (click)="clearSearch()"
+              >
+                <i [class]="icons.Close" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Filter dropdowns -->
+        <div class="link-list__filters">
+          <div class="fav-field link-list__filter">
+            <label class="fav-label" for="link-list-category-filter">Category</label>
+            <select
+              id="link-list-category-filter"
+              class="fav-input"
+              [value]="activeCategoryId() ?? ''"
+              [disabled]="categoriesLoading() || categoriesError() !== null"
+              (change)="onCategoryFilterChange($event)"
+            >
+              @if (categoriesLoading()) {
+                <option value="">Loading…</option>
+              } @else if (categoriesError()) {
+                <option value="">Unavailable</option>
+              } @else {
+                <option value="">All categories</option>
+              }
+              @for (category of categories(); track trackCategoryById($index, category)) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field link-list__filter">
+            <label class="fav-label" for="link-list-tag-filter">Tag</label>
+            <select
+              id="link-list-tag-filter"
+              class="fav-input"
+              [value]="activeTagId() ?? ''"
+              [disabled]="tagsLoading() || tagsError() !== null"
+              (change)="onTagFilterChange($event)"
+            >
+              @if (tagsLoading()) {
+                <option value="">Loading…</option>
+              } @else if (tagsError()) {
+                <option value="">Unavailable</option>
+              } @else {
+                <option value="">All tags</option>
+              }
+              @for (tag of tags(); track trackTagById($index, tag)) {
+                <option [value]="tag.id">{{ tag.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field link-list__filter">
+            <label class="fav-label" for="link-list-sort">Sort by</label>
+            <select
+              id="link-list-sort"
+              class="fav-input"
+              [value]="sortOrder()"
+              (change)="onSortChange($event)"
+            >
+              @for (option of sortOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="fav-field link-list__filter">
+            <label class="fav-label" for="link-list-status">Status</label>
+            <select
+              id="link-list-status"
+              class="fav-input"
+              [value]="activeStatus()"
+              (change)="onStatusFilterChange($event)"
+            >
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              class="fav-btn fav-btn--ghost fav-btn--sm link-list__filter-clear"
+              (click)="clearAllFilters()"
+            >
+              Clear filters
+            </button>
+          }
+        </div>
+
+        <!-- View toggle -->
+        <div class="link-list__view-toggle-wrap">
+          <fav-view-toggle pageId="links" (modeChange)="onViewModeChange($event)" />
+        </div>
+      </div>
+
+      <div class="link-list__status-tabs" role="tablist" aria-label="Link status">
+        <button
+          id="link-list-tab-active"
+          type="button"
+          class="link-list__status-tab"
+          role="tab"
+          aria-controls="link-list-tabpanel"
+          [attr.aria-selected]="activeStatus() === 'active'"
+          [class.is-active]="activeStatus() === 'active'"
+          (click)="setStatusFilter('active')"
+        >
+          Active
+        </button>
+        <button
+          id="link-list-tab-archived"
+          type="button"
+          class="link-list__status-tab"
+          role="tab"
+          aria-controls="link-list-tabpanel"
+          [attr.aria-selected]="activeStatus() === 'archived'"
+          [class.is-active]="activeStatus() === 'archived'"
+          (click)="setStatusFilter('archived')"
+        >
+          Archived
+        </button>
+        <button
+          id="link-list-tab-all"
+          type="button"
+          class="link-list__status-tab"
+          role="tab"
+          aria-controls="link-list-tabpanel"
+          [attr.aria-selected]="activeStatus() === 'all'"
+          [class.is-active]="activeStatus() === 'all'"
+          (click)="setStatusFilter('all')"
+        >
+          All
+        </button>
+      </div>
+
+      <!-- ── Mobile toolbar ─────────────────────────────────────── -->
+      <div class="link-list__toolbar link-list__toolbar--mobile"
+           role="region" aria-label="Search and filter links">
+        <div class="link-list__mobile-row">
+          <div class="link-list__search link-list__search--mobile">
+            <label for="link-list-search-mobile" class="fav-sr-only">Search your links</label>
+            <div class="link-list__search-field">
+              <i [class]="icons.Search" class="link-list__search-icon" aria-hidden="true"></i>
+              <input
+                id="link-list-search-mobile"
+                type="search"
+                class="fav-input link-list__search-input"
+                placeholder="Search links…"
+                autocomplete="off"
+                [formControl]="searchControl"
+              />
+              @if (searchControl.value) {
+                <button
+                  type="button"
+                  class="link-list__search-clear"
+                  aria-label="Clear search"
+                  (click)="clearSearch()"
+                >
+                  <i [class]="icons.Close" aria-hidden="true"></i>
+                </button>
+              }
+            </div>
+          </div>
+          <div class="link-list__mobile-actions">
+            <button
+              type="button"
+              class="fav-btn fav-btn--outline fav-btn--sm"
+              (click)="openFilterSheet()"
+              [class.is-active]="hasActiveFilters()"
+            >
+              <i class="fa-solid fa-sliders fav-icon" aria-hidden="true"></i>
+              <span>Filters</span>
+              @if (hasActiveFilters()) {
+                <span class="link-list__filter-badge" aria-label="Filters active"></span>
+              }
+            </button>
+            <fav-view-toggle pageId="links" (modeChange)="onViewModeChange($event)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter / categories load error -->
+      @if (tagsError() || categoriesError()) {
+        <div class="fav-alert fav-alert--warning link-list__filter-alert" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">
+            @if (tagsError(); as message) {
+              <p class="link-list__alert-message">{{ message }}</p>
+            }
+            @if (categoriesError(); as message) {
+              <p class="link-list__alert-message">{{ message }}</p>
+            }
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reloadFilters()">
+              Retry filters
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- ── Content area ───────────────────────────────────────────────── -->
+      <div id="link-list-tabpanel"
+           role="tabpanel"
+           [attr.aria-labelledby]="'link-list-tab-' + activeStatus()"
+           tabindex="-1">
+      @if (loading()) {
+        <div class="fav-loading link-list__loading" role="status" aria-live="polite">
+          <span class="fav-spinner" aria-hidden="true"></span>
+          <span>
+            @if (hasActiveFilters()) { Searching your links… }
+            @else { Loading your links… }
+          </span>
+        </div>
+      } @else if (error(); as message) {
+        <div class="fav-alert fav-alert--danger link-list__alert" role="alert">
+          <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+          <div class="fav-alert__body">
+            <p class="link-list__alert-message">{{ message }}</p>
+            <button type="button" class="fav-btn fav-btn--outline fav-btn--sm" (click)="reload()">
+              Try again
+            </button>
+          </div>
+        </div>
+      } @else if (links().length === 0) {
+        @if (hasActiveFilters()) {
+          <div class="fav-empty-state fav-empty-state--subtle link-list__empty">
+            <div class="fav-empty-state__icon" aria-hidden="true">
+              <i [class]="icons.Search"></i>
+            </div>
+            <h2 class="fav-empty-state__title">{{ emptyTitle() }}</h2>
+            <p class="fav-empty-state__message">
+              Try different filters, or
+              <button type="button" class="link-list__empty-link" (click)="clearAllFilters()">
+                clear all filters
+              </button>
+              to see every link.
+            </p>
+          </div>
+        } @else {
+          <div class="fav-empty-state fav-empty-state--subtle link-list__empty">
+            <div class="fav-empty-state__icon" aria-hidden="true">
+              <i [class]="icons.AllLinks"></i>
+            </div>
+            <h2 class="fav-empty-state__title">No links to show yet</h2>
+            <p class="fav-empty-state__message">
+              Once you save your first link it will appear here, with newest at the top.
+            </p>
+            <button type="button" class="fav-btn fav-btn--primary" (click)="openAddLink()">
+              <i [class]="icons.AddLink" class="fav-icon" aria-hidden="true"></i>
+              <span>Add your first link</span>
+            </button>
+          </div>
+        }
+      } @else {
+
+        <!-- ── List view ───────────────────────────────────────────── -->
+        @if (viewMode() === 'list') {
+          <ul class="link-list__items link-list__items--list" aria-label="Saved links">
+            @for (link of links(); track trackById($index, link)) {
+              <li class="link-list__row">
+                <!-- Favicon -->
+                <div class="link-list__row-favicon" aria-hidden="true">
+                  @if (preferences().showFavicon) {
+                    <img
+                      [src]="link.url | faviconUrl"
+                      [alt]="''"
+                      width="20"
+                      height="20"
+                      loading="lazy"
+                      (error)="$any($event.target).style.display='none'"
+                    />
+                  } @else {
+                    <i [class]="icons.Link" class="fav-icon" aria-hidden="true"></i>
+                  }
+                </div>
+
+                <!-- Main content -->
+                <div class="link-list__row-content">
+                  <div class="link-list__row-heading">
+                    <a
+                      class="link-list__row-title link-card__title"
+                      [href]="link.url"
+                      [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                      [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+                    >{{ link.title }}</a>
+                    <span class="link-list__row-domain">{{ link.url | domainExtract }}</span>
+                  </div>
+                  @if (link.description) {
+                    <p class="link-list__row-description">{{ link.description }}</p>
+                  }
+                  <div class="link-list__row-meta">
+                    @if (link.tags.length > 0 || link.category) {
+                      <div class="fav-badge-list link-list__row-badges" aria-label="Tags and category">
+                        @if (link.category; as cat) {
+                          <span class="fav-badge fav-badge--category">
+                            <i [class]="icons.Category" [style.color]="cat.color" aria-hidden="true"></i>
+                            <span>{{ cat.name }}</span>
+                          </span>
+                        }
+                        @for (tag of link.tags; track tag.id) {
+                          <span class="fav-badge fav-badge--tag">{{ tag.name }}</span>
+                        }
+                      </div>
+                    }
+                    <fav-status-pill
+                      [status]="link.isArchived ? 'archived' : 'active'"
+                      [class.link-card__archived]="link.isArchived"
+                    />
+                    <time class="link-list__row-date" [attr.datetime]="link.createdAtUtc">
+                      {{ link.createdAtUtc | date: 'mediumDate' }}
+                    </time>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="link-list__row-actions fav-btn-group" role="group"
+                     [attr.aria-label]="'Actions for ' + link.title">
+                  <a
+                    class="fav-btn fav-btn--ghost fav-btn--icon"
+                    [href]="link.url"
+                    [target]="preferences().openInNewTab ? '_blank' : '_self'"
+                    [attr.rel]="preferences().openInNewTab ? 'noopener noreferrer' : null"
+                    [attr.aria-label]="'Open ' + link.title"
+                    [attr.title]="'Open ' + link.title"
+                  >
+                    <i [class]="icons.OpenLink" aria-hidden="true"></i>
+                  </a>
+                  <button
+                    type="button"
+                    class="fav-btn fav-btn--ghost fav-btn--icon"
+                    [attr.aria-label]="'Edit ' + link.title"
+                    [attr.title]="'Edit ' + link.title"
+                    (click)="onEditRequested(link)"
+                  >
+                    <i [class]="icons.Edit" aria-hidden="true"></i>
+                  </button>
+                  @if (link.isArchived) {
+                    <button
+                      type="button"
+                      class="fav-btn fav-btn--ghost fav-btn--icon"
+                      [attr.aria-label]="'Restore ' + link.title"
+                      [attr.title]="'Restore ' + link.title"
+                      [disabled]="archiveBusyId() === link.id"
+                      (click)="onRestoreRequested(link)"
+                    >
+                      <i [class]="icons.Restore" aria-hidden="true"></i>
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="fav-btn fav-btn--ghost fav-btn--icon"
+                      [attr.aria-label]="'Archive ' + link.title"
+                      [attr.title]="'Archive ' + link.title"
+                      [disabled]="archiveBusyId() === link.id"
+                      (click)="onArchiveRequested(link)"
+                    >
+                      <i [class]="icons.Archive" aria-hidden="true"></i>
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="fav-btn fav-btn--ghost fav-btn--icon link-list__row-delete"
+                    [attr.aria-label]="'Delete ' + link.title"
+                    [attr.title]="'Delete ' + link.title"
+                    (click)="onDeleteRequested(link)"
+                  >
+                    <i [class]="icons.Delete" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- ── Cards view ──────────────────────────────────────────── -->
+        @if (viewMode() === 'cards') {
+          <ul class="link-list__items link-list__items--cards" aria-label="Saved links">
+            @for (link of links(); track trackById($index, link)) {
+              <li class="link-list__item">
+                <app-link-card
+                  [link]="link"
+                  [archiveBusy]="archiveBusyId() === link.id"
+                  (opened)="onLinkOpened($event)"
+                  (editRequested)="onEditRequested($event)"
+                  (archiveRequested)="onArchiveRequested($event)"
+                  (restoreRequested)="onRestoreRequested($event)"
+                  (deleteRequested)="onDeleteRequested($event)"
+                />
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- ── Pagination ──────────────────────────────────────────── -->
+        <fav-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [total]="total()"
+          (pageChange)="onPageChange($event)"
+        />
+      }
+
+      </div><!-- /#link-list-tabpanel -->
+    </div><!-- /.link-list__main -->
+
+    <!-- ── Right rail ──────────────────────────────────────── -->
+    <aside class="link-list__rail">
+
+      <!-- Quick filters widget -->
+      <fav-rail-widget title="QUICK FILTERS">
+        <ul class="link-list__rail-list" role="list">
+          <li>
+            <button type="button" class="link-list__rail-action"
+                    (click)="applyQuickFilter('newest')">
+              <i class="fa-solid fa-clock-rotate-left fav-icon" aria-hidden="true"></i>
+              Recently added
+            </button>
+          </li>
+          <li>
+            <button type="button" class="link-list__rail-action"
+                    (click)="applyQuickFilter('most-used')">
+              <i class="fa-solid fa-arrow-trend-up fav-icon" aria-hidden="true"></i>
+              Most recently updated
+            </button>
+          </li>
+          <li>
+            <button type="button" class="link-list__rail-action"
+                    (click)="applyQuickFilter('archived')">
+              <i [class]="icons.Archived + ' fav-icon'" aria-hidden="true"></i>
+              Archive only
+            </button>
+          </li>
+        </ul>
+      </fav-rail-widget>
+
+      <!-- Popular tags widget -->
+      @if (tags().length > 0) {
+        <fav-rail-widget title="POPULAR TAGS">
+          <div class="fav-badge-list link-list__rail-tags">
+            @for (tag of tags().slice(0, 10); track tag.id) {
+              <button
+                type="button"
+                class="fav-badge fav-badge--tag link-list__rail-tag-chip"
+                (click)="filterByTag(tag.id)"
+                [class.is-active]="activeTagId() === tag.id"
+              >
+                {{ tag.name }}
+              </button>
+            }
+          </div>
+        </fav-rail-widget>
+      }
+
+      <!-- Categories widget -->
+      @if (categories().length > 0) {
+        <fav-rail-widget title="CATEGORIES">
+          <ng-container slot="action">
+            <a routerLink="/app/categories" class="link-list__rail-manage">Manage</a>
+          </ng-container>
+          <ul class="link-list__rail-list" role="list">
+            @for (cat of categories().slice(0, 6); track cat.id) {
+              <li>
+                <button
+                  type="button"
+                  class="link-list__rail-action"
+                  (click)="filterByCategory(cat.id)"
+                  [class.is-active]="activeCategoryId() === cat.id"
+                >
+                  <i [class]="icons.Category + ' fav-icon'" [style.color]="cat.color" aria-hidden="true"></i>
+                  {{ cat.name }}
+                </button>
+              </li>
+            }
+          </ul>
+        </fav-rail-widget>
+      }
+
+    </aside>
+
+  </div><!-- /.link-list__layout -->
+
+  <!-- ── Mobile filter bottom sheet ────────────────────────────── -->
+  @if (filterSheetOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeFilterSheet()"></div>
+    <div class="fav-filter-sheet" role="dialog" aria-modal="true"
+         aria-label="Filter links" favFocusTrap>
+      <div class="fav-filter-sheet__header">
+        <h2 class="fav-filter-sheet__title">Filters</h2>
+        <button type="button" class="fav-modal__close" aria-label="Close filters"
+                (click)="closeFilterSheet()">
+          <i [class]="icons.Close" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="fav-filter-sheet__body">
+        <div class="fav-field">
+          <label class="fav-label" for="sheet-category-filter">Category</label>
+          <select
+            id="sheet-category-filter"
+            class="fav-input"
+            [value]="activeCategoryId() ?? ''"
+            [disabled]="categoriesLoading() || categoriesError() !== null"
+            (change)="onCategoryFilterChange($event)"
+          >
+            <option value="">All categories</option>
+            @for (category of categories(); track category.id) {
+              <option [value]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="fav-field">
+          <label class="fav-label" for="sheet-tag-filter">Tag</label>
+          <select
+            id="sheet-tag-filter"
+            class="fav-input"
+            [value]="activeTagId() ?? ''"
+            [disabled]="tagsLoading() || tagsError() !== null"
+            (change)="onTagFilterChange($event)"
+          >
+            <option value="">All tags</option>
+            @for (tag of tags(); track tag.id) {
+              <option [value]="tag.id">{{ tag.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="fav-field">
+          <label class="fav-label" for="sheet-sort">Sort by</label>
+          <select id="sheet-sort" class="fav-input" [value]="sortOrder()"
+                  (change)="onSortChange($event)">
+            @for (option of sortOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="fav-field">
+          <label class="fav-label" for="sheet-status">Status</label>
+          <select id="sheet-status" class="fav-input" [value]="activeStatus()"
+                  (change)="onStatusFilterChange($event)">
+            <option value="active">Active</option>
+            <option value="archived">Archived</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+      </div>
+      <div class="fav-filter-sheet__footer">
+        @if (hasActiveFilters()) {
+          <button type="button" class="fav-btn fav-btn--outline" (click)="clearAllFilters()">
+            Clear filters
+          </button>
+        }
+        <button type="button" class="fav-btn fav-btn--primary" (click)="closeFilterSheet()">
+          Apply filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Delete confirm modal ───────────────────────────────────────────── -->
+  @if (deleteTarget(); as target) {
+    <div class="fav-modal-backdrop" (click)="closeDeleteConfirm()"></div>
+    <div
+      class="fav-modal fav-modal--sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="link-list-delete-title"
+      aria-describedby="link-list-delete-description"
+    >
+      <div class="fav-modal__dialog" favFocusTrap>
+        <div class="fav-modal__header">
+          <div>
+            <h2 class="fav-modal__title" id="link-list-delete-title">Delete this link?</h2>
+            <p class="fav-modal__subtitle">This action cannot be undone.</p>
+          </div>
+          <button
+            type="button"
+            class="fav-modal__close"
+            aria-label="Close"
+            [disabled]="deleting()"
+            (click)="closeDeleteConfirm()"
+          >
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="fav-modal__body">
+          <p class="link-list__delete-prompt" id="link-list-delete-description">
+            You are about to permanently delete <strong>{{ target.title }}</strong>.
+          </p>
+          @if (deleteError(); as message) {
+            <div class="fav-alert fav-alert--danger" role="alert">
+              <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+              <div class="fav-alert__body">{{ message }}</div>
+            </div>
+          }
+        </div>
+        <div class="fav-modal__footer">
+          <button type="button" class="fav-btn fav-btn--outline" [disabled]="deleting()"
+                  (click)="closeDeleteConfirm()">Cancel</button>
+          <button type="button" class="fav-btn fav-btn--danger"
+                  [class.is-loading]="deleting()" [disabled]="deleting()"
+                  (click)="confirmDelete()">
+            @if (deleting()) {
+              <span class="fav-spinner" aria-hidden="true"></span>
+              <span class="fav-sr-only">Deleting link…</span>
+            }
+            <span class="fav-btn__label">Delete link</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Add link modal ────────────────────────────────────────────────── -->
+  @if (addLinkOpen()) {
+    <div class="fav-modal-backdrop" (click)="closeAddLink()"></div>
+    <div
+      class="fav-modal fav-modal--mobile-full"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="link-list-add-title"
+    >
+      <div class="fav-modal__dialog" favFocusTrap>
+        <div class="fav-modal__header">
+          <div>
+            <h2 class="fav-modal__title" id="link-list-add-title">Add link</h2>
+            <p class="fav-modal__subtitle">Save a URL with tags and a category.</p>
+          </div>
+          <button type="button" class="fav-modal__close" aria-label="Close"
+                  (click)="closeAddLink()">
+            <i [class]="icons.Close" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="fav-modal__body">
+          <app-add-link-form
+            [showCancel]="true"
+            (linkCreated)="onLinkCreated($event)"
+            (cancelled)="closeAddLink()"
+          />
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Import bookmarks modal ─────────────────────────────────── -->
+  @if (importModalOpen()) {
+    <app-import-bookmarks-modal (closed)="onImportClosed($event)" />
+  }
+
+</section>

@@ -1,0 +1,63 @@
+// Design tokens — color palette
+// Source: docs/UI_DESIGN_GUIDE.md §4
+// Expressed as CSS custom properties so Bootstrap 5.3 CSS-variable theming can consume them.
+
+:root {
+  // Surfaces
+  --fav-color-bg-page: #F6F9FC;
+  --fav-color-surface: #FFFFFF;
+  --fav-color-surface-alt: #FBFCFE;
+
+  // Borders & dividers
+  --fav-color-border: #DDE6F0;
+
+  // Text
+  --fav-color-text-heading: #061B3A;
+  --fav-color-text-body: #24364F;
+  --fav-color-text-muted: #66758A;
+
+  // Brand / primary (teal)
+  --fav-color-primary: #007C89;
+  --fav-color-primary-dark: #006B78;
+  --fav-color-primary-soft: #E6F7FA;
+
+  // Semantic
+  --fav-color-info: #0D6EFD;
+  --fav-color-success: #198754;
+  --fav-color-warning: #F59E0B;
+  --fav-color-danger: #DC3545;
+
+  // Convenience aliases for on-color text where contrast must be white
+  --fav-color-on-primary: #FFFFFF;
+  --fav-color-on-danger: #FFFFFF;
+  --fav-color-on-warning: #1F1300;
+  --fav-color-on-success: #FFFFFF;
+  --fav-color-on-info: #FFFFFF;
+
+  // Tile icon accent colors — used for tag/category tile icon circles and stat-card icon circles.
+  // Each tone has a -bg (soft circle fill) and a -fg (icon foreground) token.
+  // § 21.12 Redesign Layout Primitives
+  --fav-color-tile-icon-purple-bg: #F3EFFE;
+  --fav-color-tile-icon-purple-fg: #7C3AED;
+
+  --fav-color-tile-icon-indigo-bg: #EEF2FF;
+  --fav-color-tile-icon-indigo-fg: #4338CA;
+
+  --fav-color-tile-icon-teal-bg: #E6F7FA;
+  --fav-color-tile-icon-teal-fg: #007C89;
+
+  --fav-color-tile-icon-sky-bg: #E0F2FE;
+  --fav-color-tile-icon-sky-fg: #0284C7;
+
+  --fav-color-tile-icon-amber-bg: #FEF3C7;
+  --fav-color-tile-icon-amber-fg: #D97706;
+
+  --fav-color-tile-icon-rose-bg: #FFF1F2;
+  --fav-color-tile-icon-rose-fg: #E11D48;
+
+  --fav-color-tile-icon-lime-bg: #F7FEE7;
+  --fav-color-tile-icon-lime-fg: #65A30D;
+
+  --fav-color-tile-icon-green-bg: #DCFCE7;
+  --fav-color-tile-icon-green-fg: #16A34A;
+}

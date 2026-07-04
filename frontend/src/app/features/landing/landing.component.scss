@@ -1,0 +1,162 @@
+// Landing page — design 000 (desktop) and 000-mobile-tablet (mobile/tablet).
+
+// --- Hero -------------------------------------------------------------------
+
+.landing-hero {
+  display: grid;
+  // ~5/12 copy, ~7/12 preview
+  grid-template-columns: 5fr 7fr;
+  align-items: center;
+  gap: var(--fav-space-8);
+
+  &__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--fav-space-4);
+  }
+
+  &__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--fav-space-2);
+    font-size: var(--fav-font-size-sm);
+    font-weight: var(--fav-font-weight-medium);
+    color: var(--fav-color-primary-dark);
+    background-color: var(--fav-color-primary-soft);
+    padding: var(--fav-space-1) var(--fav-space-3);
+    border-radius: var(--fav-radius-pill);
+    width: fit-content;
+
+    i { font-size: 0.7rem; }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: var(--fav-text-landing-h1-size);
+    font-weight: var(--fav-text-landing-h1-weight);
+    color: var(--fav-color-text-heading);
+    line-height: var(--fav-line-height-tight);
+  }
+
+  &__title-accent {
+    color: var(--fav-color-primary);
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: var(--fav-color-text-body);
+    font-size: var(--fav-font-size-lg);
+    line-height: var(--fav-line-height-normal);
+    max-width: 34rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fav-space-3);
+    margin-top: var(--fav-space-2);
+  }
+
+  &__cta-primary {
+    // Override outline btn so it renders filled
+  }
+
+  &__preview-wrap {
+    // The preview component fills this cell
+  }
+}
+
+// --- 4-card feature strip ---------------------------------------------------
+
+.landing-feature-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--fav-space-5);
+}
+
+.landing-feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-5);
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--fav-radius-md);
+    background-color: var(--fav-color-primary-soft);
+    color: var(--fav-color-primary);
+    font-size: 1.125rem;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: var(--fav-font-size-md);
+    font-weight: var(--fav-font-weight-semibold);
+    color: var(--fav-color-text-heading);
+    line-height: var(--fav-line-height-tight);
+  }
+
+  &__copy {
+    margin: 0;
+    color: var(--fav-color-text-muted);
+    font-size: var(--fav-font-size-sm);
+    line-height: var(--fav-line-height-normal);
+  }
+}
+
+// =============================================================================
+// Tablet — 768px–1199px
+// =============================================================================
+
+@media (max-width: 1199.98px) {
+  .landing-hero {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--fav-space-6);
+  }
+
+  .landing-feature-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// =============================================================================
+// Mobile — below 768px
+// Stack everything vertically; CTAs go full-width; preview sits below copy.
+// =============================================================================
+
+@media (max-width: 767.98px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: var(--fav-space-5);
+
+    &__title {
+      font-size: var(--fav-font-size-4xl);
+    }
+
+    &__subtitle {
+      font-size: var(--fav-font-size-md);
+    }
+
+    &__actions {
+      flex-direction: column;
+      align-items: stretch;
+
+      .fav-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .landing-feature-strip {
+    grid-template-columns: 1fr;
+    gap: var(--fav-space-4);
+  }
+}

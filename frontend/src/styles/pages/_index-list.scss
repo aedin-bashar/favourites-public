@@ -1,0 +1,131 @@
+// Tags & Categories index page style foundation.
+// Source: docs/UI_DESIGN_GUIDE.md §13, §14, §19 ("Tags Page", "Categories Page",
+// "Mobile Tags/Categories View") and `design/Prompt Result 6 …`.
+//
+// Two render modes from the same .fav-index-list root:
+//   - Desktop (>= md): table layout with header row + body rows.
+//   - Mobile  (<  md): stacked card rows, one per item.
+// Empty-state composition is provided by `_empty-state.scss`.
+
+@use '../tokens-breakpoints' as bp;
+
+.fav-index-list {
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+  overflow: hidden;
+}
+
+// --- Table mode (desktop) -------------------------------------------------
+
+.fav-index-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fav-font-size-md);
+  color: var(--fav-color-text-body);
+
+  th, td {
+    text-align: start;
+    padding: var(--fav-space-3) var(--fav-space-4);
+    border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+    vertical-align: middle;
+  }
+
+  thead th {
+    background-color: var(--fav-color-surface-alt);
+    color: var(--fav-color-text-muted);
+    font-size: var(--fav-font-size-sm);
+    font-weight: var(--fav-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border-bottom-color: var(--fav-color-border);
+  }
+
+  tbody tr {
+    transition: background-color 120ms ease;
+
+    &:last-child td { border-bottom: 0; }
+    &:hover { background-color: var(--fav-color-surface-alt); }
+  }
+
+  // Reusable column hints
+  .fav-col-name    { width: auto; }
+  .fav-col-count   { width: 8rem; }
+  .fav-col-date    { width: 12rem; }
+  .fav-col-actions { width: 8rem; text-align: end; }
+}
+
+.fav-index-list__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--fav-space-2);
+  font-weight: var(--fav-font-weight-semibold);
+  color: var(--fav-color-text-heading);
+  min-width: 0;
+
+  // Optional color swatch (tag color or category folder icon background)
+  .fav-index-list__swatch {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: var(--fav-radius-pill);
+    background-color: var(--fav-color-primary);
+    flex: 0 0 auto;
+  }
+}
+
+.fav-index-list__meta {
+  color: var(--fav-color-text-muted);
+  font-size: var(--fav-font-size-sm);
+}
+
+.fav-index-list__actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fav-space-2);
+  white-space: nowrap;
+}
+
+// --- Card mode (mobile) ---------------------------------------------------
+// Below `md` the table collapses to stacked card rows. Markup is intended
+// to use the same `.fav-index-list` root with `<ul>` / `<li>` children.
+
+.fav-index-list__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fav-index-list__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+  padding: var(--fav-space-3) var(--fav-space-4);
+  border-bottom: var(--fav-border-width-thin) solid var(--fav-color-border);
+
+  &:last-child { border-bottom: 0; }
+}
+
+.fav-index-list__row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+// Visibility switch between the two modes.
+.fav-index-list__table { @include bp.down(md) { display: none; } }
+.fav-index-list__rows  { @include bp.up(md)   { display: none; } }
+
+// --- Toolbar (above the list — Add tag/category button, optional search) --
+
+.fav-index-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+  margin-bottom: var(--fav-space-4);
+}

@@ -1,0 +1,107 @@
+// Reusable card and panel styles — UI_DESIGN_GUIDE.md §10.
+// White/near-white surface, subtle border, soft shadow, moderate rounding.
+
+.fav-card {
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+  box-shadow: var(--fav-shadow-sm);
+  padding: var(--fav-gap-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-3);
+}
+
+.fav-card--flat {
+  box-shadow: var(--fav-shadow-none);
+}
+
+.fav-card--alt {
+  background-color: var(--fav-color-surface-alt);
+}
+
+.fav-card--compact {
+  padding: var(--fav-space-3);
+  gap: var(--fav-space-2);
+}
+
+.fav-card--clickable {
+  cursor: pointer;
+  transition: box-shadow 120ms ease, border-color 120ms ease,
+              transform 120ms ease;
+
+  &:hover {
+    box-shadow: var(--fav-shadow-md);
+    border-color: var(--fav-color-text-muted);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fav-border-focus-ring);
+  }
+}
+
+.fav-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+}
+
+.fav-card__title {
+  margin: 0;
+  font-size: var(--fav-text-card-title-size);
+  font-weight: var(--fav-text-card-title-weight);
+  color: var(--fav-color-text-heading);
+  line-height: var(--fav-line-height-snug);
+}
+
+.fav-card__subtitle {
+  margin: 0;
+  font-size: var(--fav-font-size-sm);
+  color: var(--fav-color-text-muted);
+}
+
+.fav-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-3);
+  color: var(--fav-color-text-body);
+}
+
+.fav-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+  padding-top: var(--fav-space-3);
+  border-top: var(--fav-border-width-thin) solid var(--fav-color-border);
+}
+
+// --- Panel ------------------------------------------------------------------
+// Larger structural container used for right-side dashboard summaries and
+// settings sections. Same surface as a card but flatter, with looser padding.
+
+.fav-panel {
+  background-color: var(--fav-color-surface);
+  border: var(--fav-border-width-thin) solid var(--fav-color-border);
+  border-radius: var(--fav-radius-lg);
+  padding: var(--fav-space-5) var(--fav-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fav-space-4);
+}
+
+.fav-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fav-space-3);
+}
+
+.fav-panel__title {
+  margin: 0;
+  font-size: var(--fav-text-section-size);
+  font-weight: var(--fav-text-section-weight);
+  color: var(--fav-color-text-heading);
+}

@@ -1,0 +1,3 @@
+namespace Favourites.Application.Categories.GetCategoriesDuplicates;
+
+public sealed record GetCategoriesDuplicatesQuery;

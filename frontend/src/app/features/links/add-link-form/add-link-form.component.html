@@ -1,0 +1,137 @@
+<form class="fav-form add-link-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  @if (serverError(); as message) {
+    <div class="fav-alert fav-alert--danger" role="alert">
+      <i [class]="icons.Danger" class="fav-alert__icon" aria-hidden="true"></i>
+      <div class="fav-alert__body">{{ message }}</div>
+    </div>
+  }
+
+  <div class="fav-field">
+    <label class="fav-label" for="add-link-url">
+      URL
+      <span class="fav-label__required" aria-hidden="true">*</span>
+    </label>
+    <input
+      #urlInput
+      id="add-link-url"
+      class="fav-input"
+      type="url"
+      inputmode="url"
+      autocomplete="url"
+      placeholder="https://example.com/article"
+      required
+      formControlName="url"
+      (input)="onUrlInput()"
+      (paste)="onUrlInput()"
+      [class.is-invalid]="form.controls.url.invalid && form.controls.url.touched"
+      [attr.aria-invalid]="form.controls.url.invalid && form.controls.url.touched ? 'true' : null"
+      aria-describedby="add-link-url-error add-link-url-hint"
+    />
+    <span id="add-link-url-hint" class="fav-help">
+      Paste a URL — we'll suggest a title you can edit.
+    </span>
+    @if (
+      form.controls.url.touched &&
+      (form.controls.url.hasError('required') || form.controls.url.hasError('blank'))
+    ) {
+      <span id="add-link-url-error" class="fav-field-error">Paste the link URL first.</span>
+    } @else if (form.controls.url.touched && form.controls.url.hasError('maxlength')) {
+      <span id="add-link-url-error" class="fav-field-error">
+        Use a URL that is 2048 characters or fewer.
+      </span>
+    } @else if (form.controls.url.touched && form.controls.url.hasError('url')) {
+      <span id="add-link-url-error" class="fav-field-error">
+        Start the URL with http:// or https://.
+      </span>
+    }
+  </div>
+
+  <div class="fav-field">
+    <label class="fav-label" for="add-link-title">
+      Title
+      <span class="fav-label__required" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="add-link-title"
+      class="fav-input"
+      type="text"
+      autocomplete="off"
+      maxlength="200"
+      required
+      formControlName="title"
+      (input)="onTitleInput()"
+      [class.is-invalid]="form.controls.title.invalid && form.controls.title.touched"
+      [attr.aria-invalid]="form.controls.title.invalid && form.controls.title.touched ? 'true' : null"
+      aria-describedby="add-link-title-error"
+    />
+    @if (
+      form.controls.title.touched &&
+      (form.controls.title.hasError('required') || form.controls.title.hasError('blank'))
+    ) {
+      <span id="add-link-title-error" class="fav-field-error">Add a title so this link is easy to find.</span>
+    } @else if (form.controls.title.touched && form.controls.title.hasError('maxlength')) {
+      <span id="add-link-title-error" class="fav-field-error">
+        Keep the title to 200 characters or fewer.
+      </span>
+    }
+  </div>
+
+  <div class="fav-field">
+    <label class="fav-label" for="add-link-description">
+      Description
+      <span class="fav-help">(optional)</span>
+    </label>
+    <textarea
+      id="add-link-description"
+      class="fav-input fav-textarea"
+      rows="3"
+      maxlength="2000"
+      formControlName="description"
+      [class.is-invalid]="form.controls.description.invalid && form.controls.description.touched"
+      [attr.aria-invalid]="form.controls.description.invalid && form.controls.description.touched ? 'true' : null"
+      aria-describedby="add-link-description-error"
+    ></textarea>
+    @if (form.controls.description.touched && form.controls.description.hasError('maxlength')) {
+      <span id="add-link-description-error" class="fav-field-error">
+        Keep the description to 2000 characters or fewer.
+      </span>
+    }
+  </div>
+
+  <app-link-tag-picker
+    [selectedTagIds]="selectedTagIds()"
+    [disabled]="submitting()"
+    (selectionChanged)="onTagSelectionChanged($event)"
+  />
+
+  <app-link-category-picker
+    [selectedCategoryId]="selectedCategoryId()"
+    [disabled]="submitting()"
+    (selectionChanged)="onCategorySelectionChanged($event)"
+  />
+
+  <div class="add-link-form__actions">
+    @if (showCancel()) {
+      <button
+        type="button"
+        class="fav-btn fav-btn--outline"
+        [disabled]="submitting()"
+        (click)="onCancel()"
+      >
+        <span class="fav-btn__label">Cancel</span>
+      </button>
+    }
+    <button
+      type="submit"
+      class="fav-btn fav-btn--primary"
+      [class.is-loading]="submitting()"
+      [disabled]="submitting()"
+    >
+      @if (submitting()) {
+        <span class="fav-spinner" aria-hidden="true"></span>
+        <span class="fav-sr-only">Saving link…</span>
+      }
+      <span class="fav-btn__label">Save link</span>
+    </button>
+  </div>
+</form>

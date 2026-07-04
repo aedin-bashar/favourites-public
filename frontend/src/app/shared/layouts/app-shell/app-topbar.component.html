@@ -1,0 +1,13 @@
+<header class="app-topbar" role="banner">
+  <div class="app-topbar__search">
+    <fav-app-search />
+  </div>
+
+  <div class="app-topbar__right">
+    <fav-user-menu
+      [displayName]="displayName()"
+      [email]="email()"
+      (signOut)="onSignOut()"
+    />
+  </div>
+</header>

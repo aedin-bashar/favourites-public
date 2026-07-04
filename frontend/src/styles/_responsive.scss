@@ -1,0 +1,70 @@
+// Responsive utility classes built on the breakpoint tokens.
+// Source: docs/UI_DESIGN_GUIDE.md §6, §8, §18 (accessibility / touch targets).
+//
+// These are the global, zero-import-cost helpers — drop the class on an
+// element and it Just Works. Component SCSS that needs custom queries
+// should @use 'styles/tokens-breakpoints' and call the mixins directly.
+
+@use 'tokens-breakpoints' as bp;
+
+// --- Visibility by breakpoint band -----------------------------------------
+// Semantic aliases first (most common use case), then the full ≥/< matrix.
+
+.fav-mobile-only   { @include bp.desktop-only { display: none !important; } }
+.fav-desktop-only  { @include bp.mobile-only  { display: none !important; } }
+.fav-tablet-up     { @include bp.down(md)     { display: none !important; } }
+.fav-tablet-down   { @include bp.up(lg)       { display: none !important; } }
+
+// Hide AT OR ABOVE the named breakpoint (use to remove on desktop sizes).
+@each $name in (sm, md, lg, xl, xxl) {
+  .fav-hide-#{$name}-up {
+    @include bp.up($name) { display: none !important; }
+  }
+}
+
+// Hide BELOW the named breakpoint (use to remove on small sizes).
+@each $name in (sm, md, lg, xl, xxl) {
+  .fav-hide-#{$name}-down {
+    @include bp.down($name) { display: none !important; }
+  }
+}
+
+// --- Touch-target enforcement (mobile) -------------------------------------
+// UI guide §8: "Keep touch targets at least 44px high where possible."
+// Drop `.fav-touch-target` on any interactive element to guarantee the
+// minimum on small viewports without affecting desktop sizing.
+
+@include bp.down(md) {
+  .fav-touch-target {
+    min-width: var(--fav-touch-target-min);
+    min-height: var(--fav-touch-target-min);
+  }
+}
+
+// --- Responsive container --------------------------------------------------
+// Matches the landing/page padding tokens — used by ad-hoc page wrappers
+// that don't sit inside `LandingSectionComponent` or the auth shell.
+
+.fav-container {
+  width: 100%;
+  max-width: var(--fav-page-max-width);
+  margin-inline: auto;
+  padding-inline: var(--fav-page-padding-x-sm);
+
+  @include bp.up(md) {
+    padding-inline: var(--fav-page-padding-x);
+  }
+}
+
+// --- Reduced-motion preference --------------------------------------------
+// Honours user setting site-wide; component animations already opt in
+// where appropriate (spinner, skeleton). This is the global safety net.
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
