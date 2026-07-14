@@ -1,59 +1,71 @@
-# Favourites
+# Favourites Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.3.
+This directory contains the Angular 21 frontend for Favourites. It uses standalone components, strict TypeScript, SCSS, Bootstrap, and Font Awesome.
 
-## Development server
+For full application setup, including the .NET API, SQL Server, and EF Core migrations, see the [repository README](../README.md).
 
-To start a local development server, run:
+## Prerequisites
 
-```bash
-ng serve
-```
+- A Node.js version supported by Angular 21.
+- npm.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The Angular CLI is installed locally with the project dependencies; a global installation is not required.
 
-## Code scaffolding
+## Development
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+From this directory, install the dependencies and start the development server:
 
 ```bash
-ng generate --help
+npm install
+npm start
 ```
 
-## Building
+Open `http://localhost:4200`. The development server reloads the application when source files change.
 
-To build the project run:
+Frontend requests use relative `/api` URLs. During local development, `proxy.conf.json` forwards them to the API at `http://localhost:5069`, so start the backend separately when using the application normally.
+
+## Available Commands
+
+| Command | Purpose |
+|---|---|
+| `npm start` | Start the Angular development server. |
+| `npm run build` | Create an optimized production build in `dist/`. |
+| `npm run watch` | Rebuild in development mode when source files change. |
+| `npm test` | Run the Vitest unit tests once. |
+| `npm run test:watch` | Run unit tests in watch mode. |
+| `npm run e2e:install` | Install Chromium for Playwright. |
+| `npm run e2e` | Run Playwright end-to-end tests headlessly. |
+| `npm run e2e:ui` | Open the Playwright UI runner. |
+
+## Unit Tests
+
+Run the Angular unit tests with Vitest:
 
 ```bash
-ng build
+npm test
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Use `npm run test:watch` while developing.
 
-## Running unit tests
+## End-to-End Tests
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Install Chromium once, then run the Playwright suite:
 
 ```bash
-ng test
+npm run e2e:install
+npm run e2e
 ```
 
-## Running end-to-end tests
+The end-to-end runner starts the Angular development server if necessary and stops the server it started when the test run finishes. The specs mock `/api` requests in the browser, so the .NET API and SQL Server are not required for this suite.
 
-For end-to-end (e2e) testing, run:
+Firefox, WebKit, Microsoft Edge, and mobile viewport projects are optional. See [playwright.config.ts](playwright.config.ts) and the root README's [end-to-end testing section](../README.md#end-to-end-playwright) for their environment flags and browser requirements.
+
+## Code Generation
+
+After installing dependencies, run the local Angular CLI through the project's `ng` npm script. For example:
 
 ```bash
-ng e2e
+npm run ng -- generate component features/example
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Use `npm run ng -- generate --help` to list the available schematics and options.

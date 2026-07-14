@@ -1,10 +1,10 @@
 # Favourites
 
-Favourites is a personal link manager for saving, organizing, searching, and opening important links from anywhere.
+Favourites is a personal link manager for saving, organizing, searching, and revisiting important links.
 
 ## Product Summary
 
-Favourites is a fully redesigned link manager. A user can register an account, log in, save favourite links with a title and description, organize links with tags and categories, search and filter links, archive and restore links, import and export bookmarks, and manage settings — all from a responsive UI.
+Users can create an account, save links with titles and descriptions, organize them with tags and categories, search and filter their collection, archive and restore links, import and export bookmarks, and customize the app from a responsive interface. The app also supports password recovery and account deletion.
 
 Every link, tag, and category belongs to the authenticated user who created it, so users can manage only their own data.
 
@@ -15,11 +15,11 @@ Every link, tag, and category belongs to the authenticated user who created it, 
 | Backend SDK | .NET SDK 10.x |
 | Backend target framework | `net10.0` |
 | Backend language | C# 14.0 |
-| Backend architecture | Modular monolith, Clean Architecture (Domain / Application / Infrastructure / Api) |
-| Auth | ASP.NET Core Identity with secure cookie authentication |
+| Backend architecture | Layered monolith following Clean Architecture principles (Domain / Application / Infrastructure / API) |
+| Auth | ASP.NET Core Identity with cookie authentication |
 | Frontend framework | Angular 21.x (standalone components, strict TypeScript, SCSS) |
 | Frontend styling | `bootstrap@5.3.8` |
-| Frontend icons | `@fortawesome/fontawesome-free` |
+| Frontend icons | `@fortawesome/fontawesome-free@7.x` |
 | Database | SQL Server 2022 (EF Core) |
 
 ## Prerequisites
@@ -27,12 +27,12 @@ Every link, tag, and category belongs to the authenticated user who created it, 
 Before running the application locally, install:
 
 - .NET SDK 10.x.
-- Node.js compatible with Angular 21.
+- A Node.js version supported by Angular 21.
 - npm.
-- Angular CLI 21.x.
 - Git.
 - SQL Server 2022, either as a local instance or a local Docker container.
-- A SQL Server management tool, such as SQL Server Management Studio, Azure Data Studio, or `sqlcmd`.
+
+A SQL Server management tool, such as SQL Server Management Studio or `sqlcmd`, is optional but useful.
 
 Verify the main tools with:
 
@@ -41,7 +41,6 @@ dotnet --version
 dotnet --list-sdks
 node --version
 npm --version
-ng version
 ```
 
 ## Local Startup
@@ -54,7 +53,7 @@ dotnet restore
 dotnet run
 ```
 
-The API runs as an ASP.NET Core Web API targeting `net10.0`. In Development, Swagger is available at `/swagger`.
+By default, the API runs at `http://localhost:5069`. In Development, Swagger UI is available at `http://localhost:5069/swagger`.
 
 ### Frontend
 
@@ -64,7 +63,7 @@ npm install
 npm start
 ```
 
-The Angular 21 dev server runs at `http://localhost:4200` and is allowed by the API's local CORS policy (Development only).
+The Angular 21 development server runs at `http://localhost:4200`. Requests to `/api` are proxied to `http://localhost:5069`; the API also allows the frontend origin through its Development-only CORS policy.
 
 Run the API and the frontend in separate terminals; there is no combined launcher script.
 
@@ -72,15 +71,15 @@ Run the API and the frontend in separate terminals; there is no combined launche
 
 Run SQL Server 2022 locally before starting features that need persistence. The API connects via the EF Core SQL Server provider using the connection string in `src/Favourites.Api/appsettings.Development.json`.
 
-Before the first local registration, replace the placeholder in `src/Favourites.Api/appsettings.Development.json` with your local SQL Server connection string and apply the migrations:
+Before the first local registration, configure `ConnectionStrings:DefaultConnection` in `src/Favourites.Api/appsettings.Development.json`. You can replace the entire connection string or, if its other defaults suit your environment, replace `__REPLACE_WITH_LOCAL_SQL_PASSWORD__` with the password for your local `sa` account. Then apply the migrations from the repository root. Install the `dotnet-ef` tool first if necessary, as described under [EF Core Migrations](#ef-core-migrations).
 
 ```bash
 dotnet ef database update --project src/Favourites.Infrastructure --startup-project src/Favourites.Api --context FavouritesDbContext
 ```
 
-For a default local SQL Server instance that is not listening on TCP port 1433, use `Server=localhost` instead of `Server=localhost,1433`.
+The committed development password is only a placeholder. Registration will fail if SQL Server is unavailable, the connection string is invalid, or migrations have not been applied because the required Identity tables will not be available.
 
-The committed development connection string is only a placeholder. If SQL Server is not running, the password is still the placeholder, or migrations have not been applied, registration cannot create the Identity user tables it needs.
+Password-recovery emails also require valid values in the `Email` section of `src/Favourites.Api/appsettings.Development.json` and access to the configured SMTP server.
 
 ## Using the App Locally
 
@@ -93,7 +92,7 @@ The committed development connection string is only a placeholder. If SQL Server
    - **Tags**: create, rename, and delete tags; filter and sort the tag list; merge duplicate tags; view per-tag link counts and health metrics.
    - **Categories**: create, rename, and delete categories; filter and sort the category list; merge duplicate categories; view per-category link counts.
    - **Archived**: browse archived links with tag/category/date filters; restore individual links or a selection; empty the archive; review cleanup suggestions (links archived more than 90 days).
-   - **Settings**: update profile (display name); manage preferences (theme, density, defaults, notifications); import/export bookmarks; delete archived links in bulk; delete account.
+   - **Settings**: update the display name; manage theme, density, link defaults, sorting, and notification preferences; import or export bookmarks; delete archived links in bulk; delete the account.
 5. Link creation is available from the dashboard quick-save form, the All Links `Add link` modal, and through `POST /api/links`.
 
 Quick save is optimized for paste-and-save: enter an `http` or `https` URL on the dashboard and press Enter or Save. The app derives an initial title from the URL.
@@ -138,7 +137,13 @@ The `npm run e2e` command starts the Angular dev server if one is not already ru
 
 The current end-to-end suite covers: registration; login; creating a link via the All Links modal and mobile Add action; searching, filtering, and sorting links; editing links; archiving/restoring links; deleting links; and happy-path smoke tests for the Dashboard, Tags, Categories, Archived, and Settings pages (both desktop and mobile viewports). Specs install an in-memory fake backend with `page.route`, so `npm run e2e` only needs the Angular dev server.
 
-Cross-browser and mobile viewport projects (Firefox, WebKit/Safari, Edge, Pixel 7, iPhone 14 Pro, iPad Pro) are opt-in via environment variables — see `frontend/playwright.config.ts` for the flag names (`FAVOURITES_E2E_FIREFOX`, `FAVOURITES_E2E_WEBKIT`, `FAVOURITES_E2E_MOBILE`).
+Additional browser and viewport projects are opt-in through environment variables:
+
+- `FAVOURITES_E2E_FIREFOX=1` enables Firefox and Microsoft Edge desktop projects.
+- `FAVOURITES_E2E_WEBKIT=1` enables the desktop WebKit project.
+- `FAVOURITES_E2E_MOBILE=1` enables Pixel 7, iPhone 14 Pro, and iPad Pro viewport projects.
+
+Install any additional Playwright browser binaries before enabling their projects. Microsoft Edge must be installed separately because that project uses the local `msedge` browser channel.
 
 ### EF Core Migrations
 
